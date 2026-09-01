@@ -24,8 +24,8 @@ export default async function FleetPreview() {
         <FleetHeader />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {cars.map((car) => {
-            const avg = car.reviews.length ? car.reviews.reduce((a, r) => a + r.rating, 0) / car.reviews.length : null;
+          {cars.map((car: any) => {
+            const avg = car.reviews.length ? car.reviews.reduce((a: number, r: { rating: number }) => a + r.rating, 0) / car.reviews.length : null;
             return (
               <CarCard
                 key={car.id}
