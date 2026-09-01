@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+}
+
+enum Fuel {
+  ESSENCE
+  DIESEL
+  HYBRIDE
+  ELECTRIQUE
+}
+
+// Auth.js required models
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  bookings Booking[]
+  reviews  Review[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Business models
+model Car {
+  id          String       @id @default(cuid())
+  brand       String
+  model       String
+  category    String
+  pricePerDay Int
+  transmission Transmission
+  fuel        Fuel
+  seats       Int          @default(5)
+  year        Int?
+  mileage     Int?
+  description String?      @db.Text
+  available   Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  images   CarImage[]
+  bookings Booking[]
+  reviews  Review[]
+
+  @@index([brand])
+  @@index([category])
+  @@index([pricePerDay])
+  @@index([transmission])
+  @@index([seats])
+  @@index([available])
+}
+
+model CarImage {
+  id        String   @id @default(cuid())
+  url       String
+  publicId  String?
+  carId     String
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([carId])
+}
+
+model Booking {
+  id         String        @id @default(cuid())
+  carId      String
+  car        Car           @relation(fields: [carId], references: [id])
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startDate  DateTime      @db.Date
+  endDate    DateTime      @db.Date
+  totalPrice Int
+  status     BookingStatus @default(PENDING)
+
+  // Snapshot client
+  customerName  String?
+  customerPhone String?
+  customerEmail String?
+
+  // Inspiré sbaailuxurycar.com : lieux et horaires
+  pickupLocation  String? @default("Agadir Aéroport")
+  dropoffLocation String? @default("Agadir Aéroport")
+  pickupTime      String? @default("10:00")
+  dropoffTime     String? @default("10:00")
+  notes           String? @db.Text
+
+  // Pièce d'identité (upload Cloudinary)
+  identityDocumentUrl      String?
+  identityDocumentPublicId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([carId, startDate, endDate])
+  @@index([userId])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?  @db.Text
+  carId     String
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([carId, userId])
+  @@index([carId])
+  @@index([userId])
+}
