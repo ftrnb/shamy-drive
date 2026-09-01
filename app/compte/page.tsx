@@ -5,16 +5,24 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CompteClient from "./CompteClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function ComptePage() {
   const session = await auth();
   if (!session?.user) redirect("/login?callbackUrl=/compte");
 
   const userId = (session.user as any).id as string;
-  const bookings = await prisma.booking.findMany({
-    where: { userId },
-    include: { car: { include: { images: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  let bookings: any[] = [];
+  try {
+    bookings = await prisma.booking.findMany({
+      where: { userId },
+      include: { car: { include: { images: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (e) {
+    console.error("ComptePage DB error (build without DATABASE_URL):", e);
+    bookings = [];
+  }
 
   return (
     <main className="min-h-screen bg-zinc-50">

@@ -5,10 +5,18 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ReservationHeader from "@/components/reservation/ReservationHeader";
 
+export const dynamic = "force-dynamic";
+
 export default async function ReservationPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ startDate?: string; endDate?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
-  const car = await prisma.car.findUnique({ where: { id }, include: { images: true } });
+  let car: any = null;
+  try {
+    car = await prisma.car.findUnique({ where: { id }, include: { images: true } });
+  } catch (e) {
+    console.error("ReservationPage DB error (build without DATABASE_URL):", e);
+    notFound();
+  }
   if (!car) notFound();
 
   return (

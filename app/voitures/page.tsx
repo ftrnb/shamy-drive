@@ -51,20 +51,30 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
     const s = new Date(`${params.startDate}T00:00:00`);
     const e = new Date(`${params.endDate}T00:00:00`);
     if (!isNaN(s.getTime()) && !isNaN(e.getTime()) && e > s) {
-      const overlapping = await prisma.booking.findMany({
-        where: { status: { in: ["PENDING", "CONFIRMED"] }, startDate: { lte: e }, endDate: { gte: s } },
-        select: { carId: true },
-      });
-      excludeIds = [...new Set(overlapping.map((b) => b.carId))];
-      if (excludeIds.length) where.id = { notIn: excludeIds };
+      try {
+        const overlapping = await prisma.booking.findMany({
+          where: { status: { in: ["PENDING", "CONFIRMED"] }, startDate: { lte: e }, endDate: { gte: s } },
+          select: { carId: true },
+        });
+        excludeIds = [...new Set(overlapping.map((b) => b.carId))];
+        if (excludeIds.length) where.id = { notIn: excludeIds };
+      } catch (e) {
+        console.error("VoituresPage overlapping DB error (build without DATABASE_URL):", e);
+      }
     }
   }
 
-  const cars = await prisma.car.findMany({
-    where,
-    include: { images: true, reviews: { select: { rating: true } } },
-    orderBy: [{ available: "desc" }, { pricePerDay: "asc" }],
-  });
+  let cars: any[] = [];
+  try {
+    cars = await prisma.car.findMany({
+      where,
+      include: { images: true, reviews: { select: { rating: true } } },
+      orderBy: [{ available: "desc" }, { pricePerDay: "asc" }],
+    });
+  } catch (e) {
+    console.error("VoituresPage DB error (build without DATABASE_URL):", e);
+    cars = [];
+  }
 
   return (
     <main className="min-h-screen bg-zinc-50">
@@ -80,8 +90,8 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
           <VoituresEmpty />
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {cars.map((car) => {
-              const avg = car.reviews.length ? car.reviews.reduce((a, r) => a + r.rating, 0) / car.reviews.length : null;
+            {cars.map((car: any) => {
+              const avg = car.reviews.length ? car.reviews.reduce((a: number, r: { rating: number }) => a + r.rating, 0) / car.reviews.length : null;
               return (
                 <CarCard
                   key={car.id}
