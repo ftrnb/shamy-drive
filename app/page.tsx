@@ -5,6 +5,8 @@ import SearchBar from "@/components/home/SearchBar";
 import FleetPreview from "@/components/home/FleetPreview";
 import HomeFeatures from "@/components/home/HomeFeatures";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">

@@ -2,13 +2,21 @@ import CarCard from "@/components/cars/CarCard";
 import { prisma } from "@/lib/prisma";
 import FleetHeader from "./FleetHeader";
 
+export const dynamic = "force-dynamic";
+
 export default async function FleetPreview() {
-  const cars = await prisma.car.findMany({
-    where: { available: true },
-    include: { images: true, reviews: { select: { rating: true } } },
-    take: 6,
-    orderBy: { createdAt: "desc" },
-  });
+  let cars: any[] = [];
+  try {
+    cars = await prisma.car.findMany({
+      where: { available: true },
+      include: { images: true, reviews: { select: { rating: true } } },
+      take: 6,
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (e) {
+    console.error("FleetPreview DB error (build without DATABASE_URL):", e);
+    cars = [];
+  }
 
   return (
     <section id="vehicles" className="bg-white px-4 py-20 sm:px-6 lg:px-8">
