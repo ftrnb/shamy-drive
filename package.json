@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate 2>nul || echo prisma generate skipped",
+    "postinstall": "prisma generate || echo prisma generate skipped",
     "db:seed": "tsx prisma/seed.ts",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev"
