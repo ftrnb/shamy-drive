@@ -1,11 +1,16 @@
-import NextAuth from "next-auth";
+﻿import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { loginSchema } from "./validations";
+import authConfig from "./auth.config";
 
+// Config complète : utilisée partout SAUF le middleware.
+// C'est ici qu'on peut utiliser Prisma et bcrypt sans problème,
+// car ce fichier tourne en Node.js runtime normal (API routes, pages serveur).
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
@@ -28,6 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }) {
       if (user) {
         (token as any).role = (user as any).role;
@@ -53,4 +59,3 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   secret: process.env.AUTH_SECRET,
 });
-

@@ -1,5 +1,10 @@
-import { auth } from "@/lib/auth";
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
+import authConfig from "@/lib/auth.config";
+
+// On crée une instance "auth" légère spécialement pour le middleware,
+// basée sur auth.config.ts (sans Prisma) pour rester compatible Edge Runtime.
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const { nextUrl } = req;
