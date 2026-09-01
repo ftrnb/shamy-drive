@@ -4,7 +4,7 @@ import authConfig from "@/lib/auth.config";
 
 // On crée une instance "auth" légère spécialement pour le middleware,
 // basée sur auth.config.ts (sans Prisma) pour rester compatible Edge Runtime.
-const { auth } = NextAuth(authConfig);
+const { auth } = NextAuth({ ...authConfig, trustHost: true });
 
 export default auth((req) => {
   const { nextUrl } = req;

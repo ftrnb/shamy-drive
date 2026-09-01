@@ -11,6 +11,7 @@ import authConfig from "./auth.config";
 // car ce fichier tourne en Node.js runtime normal (API routes, pages serveur).
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  trustHost: true,
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
@@ -39,14 +40,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         (token as any).role = (user as any).role;
         token.id = (user as any).id;
       }
-      // refresh role from DB on each jwt callback if needed — fail-safe during build without DB
+      // refresh role from DB on each jwt callback if needed
       if (token.email) {
-        try {
-          const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
-          if (dbUser) (token as any).role = dbUser.role;
-        } catch {
-          // ignore DB errors (e.g. placeholder DATABASE_URL during Vercel build)
-        }
+        const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
+        if (dbUser) (token as any).role = dbUser.role;
       }
       return token;
     },
