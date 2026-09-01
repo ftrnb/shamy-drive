@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 // C'est cette version qui est utilisée par le middleware (Edge Runtime),
 // donc elle ne doit importer que des choses compatibles Edge.
 export default {
+  secret: process.env.AUTH_SECRET,
   providers: [
     Credentials({
       name: "Credentials",
