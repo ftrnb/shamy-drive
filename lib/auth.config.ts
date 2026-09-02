@@ -4,6 +4,10 @@ import Credentials from "next-auth/providers/credentials";
 // Config "légère" : PAS de Prisma ici, PAS de bcrypt.
 // C'est cette version qui est utilisée par le middleware (Edge Runtime),
 // donc elle ne doit importer que des choses compatibles Edge.
+
+// DEBUG TEMPORAIRE - à retirer une fois le problème résolu
+console.log("DEBUG AUTH_SECRET length at module load:", process.env.AUTH_SECRET?.length ?? "UNDEFINED");
+
 export default {
   secret: process.env.AUTH_SECRET,
   providers: [
