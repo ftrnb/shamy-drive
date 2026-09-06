@@ -33,8 +33,12 @@ export default function HomeFeatures() {
           <p className="text-center text-xs font-black uppercase tracking-[0.25em] text-[#C1272D]">Shamy IA</p>
           <h2 className="mt-3 text-center text-3xl font-black uppercase text-white sm:text-4xl">{isFr ? "Parlez à Shamy" : "Talk to Shamy"}</h2>
           <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-6 text-zinc-400">{isFr ? "Décrivez votre besoin en phrase naturelle — notre assistant intelligent vous répond instantanément." : "Describe your need in natural language — our smart assistant answers instantly."}</p>
-          <div className="mt-8 overflow-hidden rounded-xl border border-white/10 bg-white shadow-2xl">
-            <div id="deployment-2301234b-750f-4382-bddf-70702c53a473"></div>
+          <div className="mx-auto mt-8 max-w-[1200px] overflow-hidden rounded-xl border border-white/10 bg-white shadow-2xl">
+            <div
+              id="deployment-2301234b-750f-4382-bddf-70702c53a473"
+              className="w-full"
+              style={{ height: '750px' }}
+            ></div>
           </div>
         </div>
       </section>
