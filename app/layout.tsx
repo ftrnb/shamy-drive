@@ -21,12 +21,14 @@ export const metadata: Metadata = {
 };
 
 import Providers from "./providers";
+import Script from "next/script";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <body className={`${archivo.variable} ${inter.variable} antialiased`}>
         <Providers>{children}</Providers>
+        <Script src="https://studio.pickaxe.co/api/embed/bundle.js" defer />
       </body>
     </html>
   );

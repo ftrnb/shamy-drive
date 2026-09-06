@@ -7,7 +7,7 @@ Site Full-Stack Next.js 15 + Prisma + PostgreSQL (Neon) + Auth.js v5 + Shamy IA.
 - **Backend**: Route Handlers, Prisma 6, PostgreSQL (Supabase), Zod
 - **Auth**: Supabase Auth
 , rôles USER/ADMIN, middleware protection
-- **IA**: OpenAI via `/api/ai` (jamais exposé client)
+- **IA**: Pickaxe Agent embed (intelligent assistant)
 - **Images**: Cloudinary (upload admin)
 - **Email**: Resend (confirmation réservation)
 - **Palette stricte**: `#C1272D` rouge accent, `#0A0A0A` noir, `#FFFFFF` blanc (+ gris neutres uniquement)

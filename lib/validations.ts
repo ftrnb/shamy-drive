@@ -54,8 +54,3 @@ export const reviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
   comment: z.string().max(1000).optional(),
 });
-
-export const aiChatSchema = z.object({
-  message: z.string().min(1).max(2000),
-  history: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() })).optional().default([]),
-});
