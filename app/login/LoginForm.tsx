@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { createClient } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -10,8 +10,9 @@ export default function LoginForm() {
   const router = useRouter();
   const sp = useSearchParams();
   const callbackUrl = sp.get("callbackUrl") || "/compte";
-  const [email, setEmail] = useState("client@test.ma");
-  const [password, setPassword] = useState("User123!");
+  const supabase = createClient();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -19,13 +20,21 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const res = await signIn("credentials", { email, password, redirect: false });
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     setLoading(false);
-    if (res?.error) {
-      setError("Email ou mot de passe incorrect");
+
+    if (signInError) {
+      setError(signInError.message || "Email ou mot de passe incorrect");
       return;
     }
+
     router.push(callbackUrl);
+    router.refresh();
   }
 
   return (

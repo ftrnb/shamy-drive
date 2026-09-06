@@ -4,8 +4,9 @@ Site Full-Stack Next.js 15 + Prisma + PostgreSQL (Neon) + Auth.js v5 + Shamy IA.
 
 ## Stack
 - **Frontend**: Next.js 15.5 App Router, TypeScript strict, Tailwind 4, Framer Motion, Lucide
-- **Backend**: Route Handlers, Prisma 6, PostgreSQL Neon, Zod, bcryptjs
-- **Auth**: NextAuth v5 (Credentials), rôles USER/ADMIN, middleware protection
+- **Backend**: Route Handlers, Prisma 6, PostgreSQL (Supabase), Zod
+- **Auth**: Supabase Auth
+, rôles USER/ADMIN, middleware protection
 - **IA**: OpenAI via `/api/ai` (jamais exposé client)
 - **Images**: Cloudinary (upload admin)
 - **Email**: Resend (confirmation réservation)

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase";
 import { reviewSchema } from "@/lib/validations";
 
 export async function GET(request: Request) {
@@ -17,9 +17,13 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Connectez-vous" }, { status: 401 });
-  const userId = (session.user as any).id as string;
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return NextResponse.json({ error: "Connectez-vous" }, { status: 401 });
+
+  const userId = user.id;
+  const role = user.app_metadata?.role || user.user_metadata?.role;
 
   try {
     const body = await request.json();
@@ -32,7 +36,8 @@ export async function POST(request: Request) {
     const hasBooking = await prisma.booking.findFirst({
       where: { carId, userId, status: { in: ["COMPLETED", "CONFIRMED"] } },
     });
-    if (!hasBooking && (session.user as any).role !== "ADMIN") {
+
+    if (!hasBooking && role !== "ADMIN") {
       return NextResponse.json({ error: "Vous devez avoir réservé ce véhicule pour laisser un avis" }, { status: 403 });
     }
 

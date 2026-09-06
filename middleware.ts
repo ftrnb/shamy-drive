@@ -1,31 +1,72 @@
-import NextAuth from "next-auth";
-import { NextResponse } from "next/server";
-import authConfig from "@/lib/auth.config";
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
-// On crée une instance "auth" légère spécialement pour le middleware,
-// basée sur auth.config.ts (sans Prisma) pour rester compatible Edge Runtime.
-const { auth } = NextAuth({ ...authConfig, trustHost: true });
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-export default auth((req) => {
-  const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
-  const role = (req.auth?.user as any)?.role as string | undefined;
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            request.cookies.set(name, value)
+          );
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
 
-  const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-  const isAccountRoute = nextUrl.pathname.startsWith("/compte");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
+  const isAccountRoute = request.nextUrl.pathname.startsWith("/compte");
 
   if (isAdminRoute) {
-    if (!isLoggedIn) return NextResponse.redirect(new URL("/login", nextUrl));
-    if (role !== "ADMIN") return NextResponse.redirect(new URL("/", nextUrl));
+    if (!user) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    // Check for ADMIN role in metadata
+    const role = user.app_metadata?.role || user.user_metadata?.role;
+    if (role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
-  if (isAccountRoute && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/login", nextUrl));
+  if (isAccountRoute && !user) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  return NextResponse.next();
-});
+  return response;
+}
 
 export const config = {
-  matcher: ["/admin/:path*", "/compte/:path*"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

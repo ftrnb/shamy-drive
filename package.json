@@ -13,16 +13,15 @@
     "db:migrate": "prisma migrate dev"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.10.1",
     "@prisma/client": "^6.16.0",
-    "bcryptjs": "^3.0.2",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.48.1",
     "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.544.0",
     "next": "^15.5.9",
-    "next-auth": "5.0.0-beta.29",
     "openai": "^4.104.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
@@ -32,7 +31,6 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.12",
-    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.7",

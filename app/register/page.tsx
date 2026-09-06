@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { createClient } from "@/lib/supabase";
 import { ArrowLeft } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const supabase = createClient();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,19 +20,24 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, password }) });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Inscription échouée");
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+            role: "USER",
+          },
+        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message || "Inscription échouée");
         return;
       }
-      // auto login
-      const login = await signIn("credentials", { email, password, redirect: false });
-      if (login?.error) {
-        router.push("/login");
-        return;
-      }
+
       router.push("/compte");
+      router.refresh();
     } catch {
       setError("Erreur réseau");
     } finally {

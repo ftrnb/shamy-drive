@@ -4,15 +4,45 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
+import { createClient } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/lib/language-context";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { data: session, status } = useSession();
-  const role = (session?.user as any)?.role as string | undefined;
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+  const router = useRouter();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+    };
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (_event === 'SIGNED_IN') router.refresh();
+      if (_event === 'SIGNED_OUT') router.refresh();
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase, router]);
+
+  const role = user?.app_metadata?.role || user?.user_metadata?.role;
   const { t } = useLanguage();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50">
@@ -33,25 +63,25 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-3 md:flex">
             <LanguageSwitcher />
-            {status === "authenticated" ? (
+            {!loading && user ? (
               <>
                 <Link href="/compte" className="flex items-center gap-2 border border-white/15 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white hover:bg-white hover:text-black transition">
                   <User className="h-4 w-4" />
-                  {session.user?.name?.split(" ")[0] || t("nav_account")}
+                  {user.user_metadata?.full_name?.split(" ")[0] || t("nav_account")}
                 </Link>
                 {role === "ADMIN" && (
                   <Link href="/admin" className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-[#C1272D] hover:text-white">
                     <LayoutDashboard className="h-4 w-4" /> Admin
                   </Link>
                 )}
-                <button onClick={() => signOut({ callbackUrl: "/" })} className="text-zinc-400 hover:text-white transition"><LogOut className="h-5 w-5" /></button>
+                <button onClick={handleSignOut} className="text-zinc-400 hover:text-white transition"><LogOut className="h-5 w-5" /></button>
               </>
-            ) : (
+            ) : !loading ? (
               <>
                 <Link href="/login" className="text-sm font-medium text-zinc-300 hover:text-white">{t("nav_login")}</Link>
                 <Link href="/voitures" className="bg-[#C1272D] px-5 py-3 text-xs font-black uppercase tracking-widest text-white hover:bg-white hover:text-black transition">{t("nav_book")}</Link>
               </>
-            )}
+            ) : null}
           </div>
 
           <button onClick={() => setMobileOpen(!mobileOpen)} className="flex h-10 w-10 items-center justify-center border border-white/10 text-white md:hidden" aria-label="Menu">
@@ -67,11 +97,11 @@ export default function Navbar() {
             <Link href="/a-propos" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-sm text-zinc-300 hover:text-white">{t("nav_about")}</Link>
             <Link href="/faq" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-sm text-zinc-300 hover:text-white">{t("nav_faq")}</Link>
             <Link href="/contact" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-sm text-zinc-300 hover:text-white">{t("nav_contact")}</Link>
-            {status === "authenticated" ? (
+            {user ? (
               <>
                 <Link href="/compte" onClick={() => setMobileOpen(false)} className="block border border-white/10 px-4 py-3 text-xs font-black uppercase text-white">Mon compte</Link>
                 {role === "ADMIN" && <Link href="/admin" onClick={() => setMobileOpen(false)} className="block px-4 py-2 text-xs font-bold text-[#C1272D]">Dashboard Admin</Link>}
-                <button onClick={() => signOut()} className="w-full px-4 py-3 text-left text-sm text-zinc-400">Déconnexion</button>
+                <button onClick={handleSignOut} className="w-full px-4 py-3 text-left text-sm text-zinc-400">Déconnexion</button>
               </>
             ) : (
               <Link href="/login" onClick={() => setMobileOpen(false)} className="block bg-[#C1272D] px-4 py-4 text-center text-xs font-black uppercase text-white">Connexion</Link>

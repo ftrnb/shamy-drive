@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase";
 import { bookingCreateSchema, bookingStatusSchema } from "@/lib/validations";
 import { calculateDays } from "@/lib/utils";
 import { sendBookingConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";
 
 export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
-  const role = (session.user as any).role;
-  const userId = (session.user as any).id;
+  const role = user.app_metadata?.role || user.user_metadata?.role;
+  const userId = user.id;
 
   const where: any = {};
   if (role !== "ADMIN") where.userId = userId;
@@ -37,11 +39,13 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Connectez-vous pour réserver" }, { status: 401 });
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const userId = (session.user as any).id as string;
-  const userEmail = session.user.email as string;
+  if (!user) return NextResponse.json({ error: "Connectez-vous pour réserver" }, { status: 401 });
+
+  const userId = user.id;
+  const userEmail = user.email as string;
 
   try {
     const body = await request.json();
@@ -86,7 +90,7 @@ export async function POST(request: Request) {
         endDate: end,
         totalPrice,
         status: "PENDING",
-        customerName: customerName || (session.user.name as string) || null,
+        customerName: customerName || (user.user_metadata?.full_name as string) || null,
         customerPhone: customerPhone || null,
         customerEmail: customerEmail || userEmail,
         pickupLocation: pickupLocation || "Agadir Aéroport Al Massira",
@@ -114,7 +118,7 @@ export async function POST(request: Request) {
       endDate,
       total: totalPrice,
       days,
-      customerName: customerName || (session.user.name as string) || "—",
+      customerName: customerName || (user.user_metadata?.full_name as string) || "—",
       customerPhone: customerPhone || "—",
       customerEmail: customerEmail || userEmail,
       pickupLocation: pickupLocation || "Agadir Aéroport Al Massira",
@@ -130,8 +134,10 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
   try {
     const body = await request.json();
@@ -140,8 +146,8 @@ export async function PATCH(request: Request) {
     const parsed = bookingStatusSchema.safeParse(status);
     if (!parsed.success) return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
 
-    const role = (session.user as any).role;
-    const userId = (session.user as any).id;
+    const role = user.app_metadata?.role || user.user_metadata?.role;
+    const userId = user.id;
 
     const booking = await prisma.booking.findUnique({ where: { id } });
     if (!booking) return NextResponse.json({ error: "Réservation introuvable" }, { status: 404 });

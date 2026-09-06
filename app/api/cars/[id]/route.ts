@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { carUpdateSchema } from "@/lib/validations";
-import { auth } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase";
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -21,8 +21,11 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const session = await auth();
-  if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const role = user?.app_metadata?.role || user?.user_metadata?.role;
+
+  if (role !== "ADMIN") return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   try {
     const body = await request.json();
@@ -53,8 +56,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const session = await auth();
-  if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const role = user?.app_metadata?.role || user?.user_metadata?.role;
+
+  if (role !== "ADMIN") return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   try {
     // Vérifier réservations futures

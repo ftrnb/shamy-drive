@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { carCreateSchema } from "@/lib/validations";
-import { auth } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -99,9 +99,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  const role = (session?.user as any)?.role;
-  if (!session || role !== "ADMIN") {
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const role = user?.app_metadata?.role || user?.user_metadata?.role;
+
+  if (role !== "ADMIN") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 

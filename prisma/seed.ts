@@ -1,5 +1,4 @@
 import { PrismaClient, Transmission, Fuel } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -153,36 +152,7 @@ async function main() {
   await prisma.booking.deleteMany();
   await prisma.carImage.deleteMany();
   await prisma.car.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.account.deleteMany();
-  await prisma.verificationToken.deleteMany();
   await prisma.user.deleteMany();
-
-  const adminPassword = await bcrypt.hash("Admin123!", 10);
-  const userPassword = await bcrypt.hash("User123!", 10);
-
-  const admin = await prisma.user.create({
-    data: {
-      name: "Shamy Admin",
-      email: "admin@shamydrive.ma",
-      password: adminPassword,
-      role: "ADMIN",
-      emailVerified: new Date(),
-    },
-  });
-
-  const user = await prisma.user.create({
-    data: {
-      name: "Test Client",
-      email: "client@test.ma",
-      password: userPassword,
-      role: "USER",
-      emailVerified: new Date(),
-    },
-  });
-
-  console.log(`👤 Admin: ${admin.email} / Admin123!`);
-  console.log(`👤 User: ${user.email} / User123!`);
 
   for (const car of cars) {
     const { images, ...carData } = car;

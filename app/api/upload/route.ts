@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase";
 import { cloudinary, isCloudinaryConfigured } from "@/lib/cloudinary";
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Non authentifié — connectez-vous" }, { status: 401 });
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return NextResponse.json({ error: "Non authentifié — connectez-vous" }, { status: 401 });
 
   // Autorise USER et ADMIN — la pièce d'identité est uploadée par le client lors de la réservation
   // Pour les images voitures, on vérifiera côté client si besoin, mais on autorise tout upload authentifié

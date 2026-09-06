@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { createClient } from "@/lib/supabase";
 import { CalendarDays, CheckCircle2, MapPin, User, Phone, Mail, Clock, Upload, FileText, Shield } from "lucide-react";
 import { calculateDays } from "@/lib/utils";
 import { useLanguage } from "@/lib/language-context";
@@ -15,9 +16,16 @@ const LOCATIONS = ["Agadir Aéroport Al Massira", "Agadir Centre Ville", "Taghaz
 const TIMES = ["08:00", "09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
 
 export default function ReservationClient({ car, initialStartDate, initialEndDate }: { car: any; initialStartDate: string; initialEndDate: string }) {
-  const { status } = useSession();
+  const [user, setUser] = useState<any>(null);
+  const supabase = createClient();
   const router = useRouter();
   const { lang, t } = useLanguage();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+  }, [supabase]);
 
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
@@ -75,7 +83,7 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
     setError(null);
     setSuccess(null);
 
-    if (status !== "authenticated") {
+    if (!user) {
       router.push(`/login?callbackUrl=/reservation/${car.id}?startDate=${startDate}&endDate=${endDate}`);
       return;
     }
@@ -306,7 +314,7 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
           {success && <p className="bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">{success}</p>}
 
           <button type="submit" disabled={loading || !booking.valid || uploadingId} className={`flex w-full items-center justify-center gap-2 px-6 py-4 text-sm font-black uppercase tracking-widest transition ${booking.valid && !uploadingId ? "bg-[#C1272D] text-white hover:bg-black" : "bg-zinc-200 text-zinc-400 cursor-not-allowed"}`}>
-            {status !== "authenticated" ? t("reservation_login_required") : loading ? (lang === "fr" ? "Vérification..." : "Checking...") : t("reservation_submit")}
+            {!user ? t("reservation_login_required") : loading ? (lang === "fr" ? "Vérification..." : "Checking...") : t("reservation_submit")}
           </button>
 
           <a href={waUrl} target="_blank" rel="noopener noreferrer" className="flex w-full items-center justify-center gap-2 border border-zinc-300 bg-white px-6 py-3 text-sm font-bold uppercase tracking-widest hover:border-black transition">

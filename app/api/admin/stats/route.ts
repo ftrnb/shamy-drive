@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase";
 
 export async function GET() {
-  const session = await auth();
-  if ((session?.user as any)?.role !== "ADMIN") return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const role = user?.app_metadata?.role || user?.user_metadata?.role;
+
+  if (role !== "ADMIN") return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   const [totalCars, totalBookings, pendingBookings, totalUsers, revenue] = await Promise.all([
     prisma.car.count(),
