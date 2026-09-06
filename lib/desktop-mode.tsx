@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { setDesktopViewport } from "./viewport";
+import { setDesktopViewport } from "@/lib/viewport";
 
 type DesktopModeContextType = {
   isDesktopMode: boolean;
