@@ -1,10 +1,13 @@
 import Link from "next/link";
-import { auth } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
-  if ((session?.user as any)?.role !== "ADMIN") redirect("/");
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const role = user?.app_metadata?.role || user?.user_metadata?.role;
+  if (role !== "ADMIN") redirect("/");
 
   return (
     <div className="min-h-screen bg-zinc-100">

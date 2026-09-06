@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { bookingCreateSchema, bookingStatusSchema } from "@/lib/validations";
 import { calculateDays } from "@/lib/utils";
 import { sendBookingConfirmation, sendAdminNewBookingAlert } from "@/lib/resend";

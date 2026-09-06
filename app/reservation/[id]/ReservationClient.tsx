@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { createClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { CalendarDays, CheckCircle2, MapPin, User, Phone, Mail, Clock, Upload, FileText, Shield } from "lucide-react";
 import { calculateDays } from "@/lib/utils";
 import { useLanguage } from "@/lib/language-context";

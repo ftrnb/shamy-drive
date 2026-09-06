@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cloudinary, isCloudinaryConfigured } from "@/lib/cloudinary";
 
 export async function POST(request: Request) {
