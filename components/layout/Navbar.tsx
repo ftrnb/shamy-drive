@@ -26,7 +26,7 @@ export default function Navbar() {
 
     getUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setUser(session?.user ?? null);
       if (_event === 'SIGNED_IN') router.refresh();
       if (_event === 'SIGNED_OUT') router.refresh();

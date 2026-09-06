@@ -22,7 +22,7 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
   const { lang, t } = useLanguage();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: any) => {
       setUser(user);
     });
   }, [supabase]);
