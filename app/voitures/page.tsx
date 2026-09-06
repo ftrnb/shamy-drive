@@ -65,6 +65,7 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
   }
 
   let cars: any[] = [];
+  let dbError = false;
   try {
     cars = await prisma.car.findMany({
       where,
@@ -72,7 +73,8 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
       orderBy: [{ available: "desc" }, { pricePerDay: "asc" }],
     });
   } catch (e) {
-    console.error("VoituresPage DB error (build without DATABASE_URL):", e);
+    console.error("VoituresPage DB error:", e);
+    dbError = true;
     cars = [];
   }
 
@@ -86,7 +88,12 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
 
         <VoituresAvailable startDate={params.startDate} endDate={params.endDate} count={cars.length} />
 
-        {cars.length === 0 ? (
+        {dbError ? (
+          <div className="border border-red-200 bg-red-50 p-10 text-center text-red-800">
+            <p className="font-black uppercase">Erreur de connexion à la base de données</p>
+            <p className="mt-2 text-sm opacity-80">Vérifie ta configuration DATABASE_URL et assure-toi que ta base est en ligne.</p>
+          </div>
+        ) : cars.length === 0 ? (
           <VoituresEmpty />
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
