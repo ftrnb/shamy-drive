@@ -40,10 +40,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         (token as any).role = (user as any).role;
         token.id = (user as any).id;
       }
-      // refresh role from DB on each jwt callback if needed
+      // refresh role from DB — ne jamais faire échouer la session si la DB est injoignable
       if (token.email) {
-        const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
-        if (dbUser) (token as any).role = dbUser.role;
+        try {
+          const dbUser = await prisma.user.findUnique({ where: { email: token.email } });
+          if (dbUser) (token as any).role = dbUser.role;
+        } catch (e) {
+          console.error("[auth][jwt] role refresh failed, keeping token role:", (e as Error)?.message ?? e);
+        }
       }
       return token;
     },

@@ -23,6 +23,12 @@ export default async function FleetPreview() {
       <div className="mx-auto max-w-7xl">
         <FleetHeader />
 
+        {cars.length === 0 ? (
+          <div className="border border-zinc-200 bg-zinc-50 p-10 text-center">
+            <p className="text-lg font-black uppercase text-zinc-900">Aucun véhicule disponible pour le moment</p>
+            <p className="mt-2 text-sm text-zinc-500">Contactez-nous sur WhatsApp, on vous confirme la disponibilité en direct.</p>
+          </div>
+        ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {cars.map((car: any) => {
             const avg = car.reviews.length ? car.reviews.reduce((a: number, r: { rating: number }) => a + r.rating, 0) / car.reviews.length : null;
@@ -44,6 +50,7 @@ export default async function FleetPreview() {
             );
           })}
         </div>
+        )}
       </div>
     </section>
   );

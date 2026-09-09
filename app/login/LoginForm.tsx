@@ -22,7 +22,11 @@ export default function LoginForm() {
     const res = await signIn("credentials", { email, password, redirect: false });
     setLoading(false);
     if (res?.error) {
-      setError("Email ou mot de passe incorrect");
+      if (res.error === "CredentialsSignin") {
+        setError("Email ou mot de passe incorrect");
+      } else {
+        setError("Erreur serveur, réessayez dans un instant.");
+      }
       return;
     }
     router.push(callbackUrl);

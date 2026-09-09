@@ -13,3 +13,4 @@ coverage
 *.log
 .DS_Store
 .vercel
+public/uploads/

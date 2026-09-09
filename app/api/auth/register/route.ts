@@ -21,8 +21,15 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ user }, { status: 201 });
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    console.error("[register]", e);
+    // Base de données injoignable (mauvaise DATABASE_URL sur Vercel, Neon en pause, etc.)
+    if (e?.code === "P1001" || /can't reach database|connect|timed out|ENOTFOUND|ECONNREFUSED/i.test(e?.message ?? "")) {
+      return NextResponse.json(
+        { error: "Service momentanément indisponible (base de données). Réessayez dans un instant." },
+        { status: 503 }
+      );
+    }
     return NextResponse.json({ error: "Erreur inscription" }, { status: 500 });
   }
 }
