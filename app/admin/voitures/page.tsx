@@ -15,11 +15,11 @@ export default async function AdminVoituresPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase">Véhicules — CRUD</h1>
-      <p className="mt-1 text-sm text-zinc-500">{dbError ? "Erreur de connexion" : `${cars.length} véhicules en base`}</p>
+      <h1 className="font-display text-[28px] font-bold tracking-tight">Véhicules</h1>
+      <p className="mt-1 text-[14px] text-on-surface-variant">{dbError ? "Erreur de connexion" : `${cars.length} véhicules en base`}</p>
 
       {dbError ? (
-        <div className="mt-6 border border-red-200 bg-red-50 p-6 text-red-800">
+        <div className="mt-6 rounded-[24px] border border-error/30 bg-error-container/40 p-6 text-error">
           Vérifie ton <strong>DATABASE_URL</strong>. Prisma n'arrive pas à se connecter.
         </div>
       ) : (

@@ -11,8 +11,8 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase">Utilisateurs</h1>
-      <p className="mt-1 text-sm text-zinc-500">{users.length} comptes</p>
+      <h1 className="font-display text-[28px] font-bold tracking-tight">Utilisateurs</h1>
+      <p className="mt-1 text-[14px] text-on-surface-variant">{users.length} comptes</p>
       <div className="mt-6">
         <AdminUsersClient users={users as any} />
       </div>

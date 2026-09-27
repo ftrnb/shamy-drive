@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { XCircle, Star, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Stagger, StaggerItem, FadeImage, Spinner } from "@/components/ui/Motion";
 
 export default function CompteClient({ bookings }: { bookings: any[] }) {
   const [items, setItems] = useState(bookings);
@@ -36,12 +37,13 @@ export default function CompteClient({ bookings }: { bookings: any[] }) {
   }
 
   return (
-    <div className="space-y-3">
+    <Stagger className="space-y-3" gap={0.09}>
       {error && <p role="alert" className="rounded-2xl bg-error-container/60 px-4 py-3 text-[13px] font-semibold text-error">{error}</p>}
       {items.map((b) => (
-        <div key={b.id} className="flex flex-col gap-4 rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-m3-1 sm:flex-row sm:items-center">
-          <div className="img-fade h-28 w-full shrink-0 overflow-hidden rounded-2xl sm:w-44">
-            <img src={b.car.images[0]?.url || "/cars/Loganblanche.png"} alt={b.car.model} className="h-full w-full object-contain p-2" />
+        <StaggerItem key={b.id}>
+        <div className="flex flex-col gap-4 rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-m3-1 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-m3-2 sm:flex-row sm:items-center">
+          <div className="img-fade h-28 w-full shrink-0 overflow-hidden rounded-2xl transition-transform duration-300 hover:scale-[1.02] sm:w-44">
+            <FadeImage src={b.car.images[0]?.url || "/cars/Loganblanche.png"} alt={b.car.model} className="object-contain p-2" />
           </div>
           <div className="flex-1">
             <p className="text-[12px] font-bold uppercase tracking-widest text-primary">{b.car.brand} {b.car.model} • {b.car.category}</p>
@@ -50,25 +52,26 @@ export default function CompteClient({ bookings }: { bookings: any[] }) {
             <span className={cn("mt-2 inline-flex rounded-full px-3 py-1 text-[11px] font-bold", b.status === "CONFIRMED" ? "bg-success-container text-on-success-container" : b.status === "CANCELLED" ? "bg-surface-container text-on-surface-variant" : "bg-tertiary-container text-on-tertiary-container")}>{b.status}</span>
           </div>
           <div className="flex flex-col gap-2 sm:items-end">
-            <Link href={`/voitures/${b.car.id}`} className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-outline-variant px-5 text-[13px] font-bold">Voir véhicule</Link>
+            <Link href={`/voitures/${b.car.id}`} className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-outline-variant px-5 text-[13px] font-bold transition hover:border-primary hover:text-primary active:scale-[0.98]">Voir véhicule</Link>
             {(b.status === "PENDING" || b.status === "CONFIRMED") && (
               confirmId === b.id ? (
                 <div className="flex gap-2">
-                  <button onClick={() => cancel(b.id)} disabled={loadingId === b.id} className="inline-flex min-h-[48px] items-center rounded-full bg-error px-5 text-[13px] font-bold text-white disabled:opacity-50">{loadingId === b.id ? "..." : "Confirmer"}</button>
-                  <button onClick={() => setConfirmId(null)} className="inline-flex min-h-[48px] items-center rounded-full bg-surface-container px-5 text-[13px] font-bold">Garder</button>
+                  <button type="button" onClick={() => cancel(b.id)} disabled={loadingId === b.id} className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-error px-5 text-[13px] font-bold text-white transition active:scale-[0.98] disabled:opacity-50">{loadingId === b.id ? <Spinner className="h-4 w-4" /> : null}{loadingId === b.id ? "..." : "Confirmer"}</button>
+                  <button type="button" onClick={() => setConfirmId(null)} className="inline-flex min-h-[48px] items-center rounded-full bg-surface-container px-5 text-[13px] font-bold transition active:scale-[0.98]">Garder</button>
                 </div>
               ) : (
-                <button onClick={() => setConfirmId(b.id)} className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-error-container/60 px-5 text-[13px] font-bold text-error transition hover:bg-error hover:text-white">
+                <button type="button" onClick={() => setConfirmId(b.id)} className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-error-container/60 px-5 text-[13px] font-bold text-error transition hover:bg-error hover:text-white active:scale-[0.98]">
                   <XCircle className="h-4 w-4" /> Annuler
                 </button>
               )
             )}
             {b.status === "COMPLETED" && (
-              <Link href={`/voitures/${b.car.id}#avis`} className="inline-flex items-center gap-1.5 text-[13px] font-bold text-on-surface-variant hover:text-ink"><Star className="h-4 w-4" /> Laisser un avis</Link>
+              <Link href={`/voitures/${b.car.id}#avis`} className="link-underline inline-flex items-center gap-1.5 text-[13px] font-bold text-on-surface-variant hover:text-ink"><Star className="h-4 w-4" /> Laisser un avis</Link>
             )}
           </div>
         </div>
+        </StaggerItem>
       ))}
-    </div>
+    </Stagger>
   );
 }

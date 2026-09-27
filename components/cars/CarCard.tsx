@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { Users, Fuel, Settings2, ArrowRight, Star } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/lib/language-context";
-import { FadeImage } from "@/components/ui/Motion";
+import { FadeImage, easeOut } from "@/components/ui/Motion";
 import { cn } from "@/lib/utils";
 
 interface CarCardProps {
@@ -22,10 +23,17 @@ interface CarCardProps {
 
 export default function CarCard({ id, brand, model, category, pricePerDay, image, transmission, fuel, seats, avgRating, available = true }: CarCardProps) {
   const { t } = useLanguage();
+  const reduce = useReducedMotion();
   const imgSrc = !image ? "/cars/Loganblanche.png" : image;
 
   return (
-    <article className="m3-card-hover group flex flex-col overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1 transition-colors duration-300 hover:shadow-m3-3">
+    <motion.article
+      initial={reduce ? false : { opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.55, ease: easeOut }}
+      className="m3-card-hover group flex flex-col overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1 transition-colors duration-300 hover:shadow-m3-3"
+    >
       <Link href={`/voitures/${id}`} className="block focus:outline-none" aria-label={`${brand} ${model} — ${pricePerDay} DH par jour`}>
         <div className="img-fade relative aspect-[16/10] overflow-hidden p-5">
           <div className="h-full w-full transition-transform duration-500 group-hover:scale-[1.04]">
@@ -75,6 +83,6 @@ export default function CarCard({ id, brand, model, category, pricePerDay, image
           <ArrowRight className="arrow-nudge h-5 w-5" />
         </Link>
       </div>
-    </article>
+    </motion.article>
   );
 }

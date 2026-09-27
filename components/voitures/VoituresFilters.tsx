@@ -1,14 +1,23 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/lib/language-context";
 import { Search, RotateCcw } from "lucide-react";
 import { fieldInput } from "@/components/ui/Field";
+import { easeOut } from "@/components/ui/Motion";
 
 export default function VoituresFilters({ q, category, transmission, fuel, maxPrice }: { q?: string; category?: string; transmission?: string; fuel?: string; maxPrice?: string }) {
   const { t } = useLanguage();
+  const reduce = useReducedMotion();
   const hasActive = Boolean(q || category || transmission || fuel || maxPrice);
   return (
-    <form method="get" className="mb-5 rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-4 shadow-m3-1 sm:p-5">
+    <motion.form
+      method="get"
+      initial={reduce ? false : { opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.15, ease: easeOut }}
+      className="mb-5 rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-4 shadow-m3-1 transition-shadow duration-300 focus-within:shadow-m3-2 sm:p-5"
+    >
       <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1fr_auto]">
         <label className="relative block">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline" />
@@ -34,8 +43,8 @@ export default function VoituresFilters({ q, category, transmission, fuel, maxPr
         </select>
         <input name="maxPrice" defaultValue={maxPrice} placeholder={t("vehicles_filter_budget")} type="number" min={0} inputMode="numeric" className={fieldInput} aria-label={t("vehicles_filter_budget")} />
         <div className="flex gap-2">
-          <button type="submit" className="flex h-[56px] min-h-[56px] flex-1 items-center justify-center gap-2 rounded-full bg-ink px-6 text-[14px] font-bold text-white transition hover:bg-primary active:scale-[0.98] lg:flex-none">
-            <Search className="h-4 w-4" /> {t("vehicles_filter_btn")}
+          <button type="submit" className="group flex h-[56px] min-h-[56px] flex-1 items-center justify-center gap-2 rounded-full bg-ink px-6 text-[14px] font-bold text-white transition hover:bg-primary active:scale-[0.98] lg:flex-none">
+            <Search className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" /> {t("vehicles_filter_btn")}
           </button>
           {hasActive && (
             <a href="/voitures" aria-label="Réinitialiser" className="flex h-[56px] w-[56px] items-center justify-center rounded-full border border-outline-variant text-on-surface-variant transition hover:bg-surface-container">
@@ -44,7 +53,7 @@ export default function VoituresFilters({ q, category, transmission, fuel, maxPr
           )}
         </div>
       </div>
-    </form>
+    </motion.form>
   );
 }
 

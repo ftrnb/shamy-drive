@@ -231,6 +231,26 @@ select option { background: var(--color-surface-container-lowest); color: var(--
 .group .arrow-nudge { transition: transform var(--dur-short) var(--ease-emphasized); }
 .group:hover .arrow-nudge { transform: translateX(4px); }
 
+/* Animated underline for text links */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1.5px;
+  background-repeat: no-repeat;
+  background-position: left calc(100% - 1px);
+  transition: background-size var(--dur-medium) var(--ease-emphasized);
+  padding-bottom: 2px;
+}
+.link-underline:hover { background-size: 100% 1.5px; }
+
+/* FAQ accordion answer entrance (replays every time <details> opens) */
+details[open] > .faq-answer { animation: m3-fade-up 0.35s var(--ease-emphasized) both; }
+details > summary { transition: background-color var(--dur-short) var(--ease-standard); }
+details > summary:hover { background-color: color-mix(in srgb, var(--color-surface-container) 60%, transparent); }
+
+/* Admin table row hover */
+.admin-row { transition: background-color var(--dur-short) var(--ease-standard); }
+.admin-row:hover { background-color: var(--color-surface-container-low); }
+
 /* Reduced motion — kill expressive springs */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

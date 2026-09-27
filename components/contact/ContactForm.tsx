@@ -6,6 +6,7 @@ import { MField, fieldInput } from "@/components/ui/Field";
 import { Spinner } from "@/components/ui/Motion";
 import { toast } from "@/components/ui/Toaster";
 import { Send, CheckCircle2, MessageCircle } from "lucide-react";
+import Reveal from "@/components/ui/Reveal";
 
 export default function ContactForm() {
   const { t, lang } = useLanguage();
@@ -46,6 +47,7 @@ export default function ContactForm() {
   }
 
   return (
+    <Reveal y={24}>
     <form onSubmit={onSubmit} className="h-fit rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-6 shadow-m3-1 transition-colors duration-300 sm:p-8 lg:sticky lg:top-24">
       <h2 className="font-display text-[20px] font-bold">{t("contact_form_title")}</h2>
       <p className="mt-1 text-[13px] text-on-surface-variant">{t("contact_form_desc")}</p>
@@ -77,5 +79,6 @@ export default function ContactForm() {
         )}
       </div>
     </form>
+    </Reveal>
   );
 }

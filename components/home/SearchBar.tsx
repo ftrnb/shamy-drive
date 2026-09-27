@@ -5,6 +5,7 @@ import { CalendarDays, MapPin, Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import { MField, fieldInput, fieldSelect } from "@/components/ui/Field";
+import Reveal from "@/components/ui/Reveal";
 import { calculateDays } from "@/lib/utils";
 
 const LOCATIONS = ["Agadir Aéroport Al Massira", "Agadir Centre Ville", "Taghazout", "Tamraght", "Essaouira", "Marrakech"];
@@ -45,9 +46,10 @@ export default function SearchBar() {
 
   return (
     <section className="relative z-20 px-3 sm:px-5" aria-label="Recherche">
+      <Reveal y={28}>
       <form
         onSubmit={handleSearch}
-        className="mx-auto -mt-2 max-w-6xl rounded-[28px] border border-outline-variant/50 bg-surface-container-lowest p-4 shadow-m3-3 sm:p-6"
+        className="mx-auto -mt-2 max-w-6xl rounded-[28px] border border-outline-variant/50 bg-surface-container-lowest p-4 shadow-m3-3 transition-shadow duration-300 focus-within:shadow-m3-4 sm:p-6"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="inline-flex items-center gap-2 text-[13px] font-bold text-primary">
@@ -97,6 +99,7 @@ export default function SearchBar() {
         {notice && <p role="status" className="mt-3 rounded-2xl bg-tertiary-container/50 px-4 py-2.5 text-[13px] font-medium">{notice}</p>}
         <p className="mt-3 text-[12px] leading-5 text-outline">{t("search_hint")}</p>
       </form>
+      </Reveal>
     </section>
   );
 }

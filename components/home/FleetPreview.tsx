@@ -1,7 +1,6 @@
 import CarCard from "@/components/cars/CarCard";
 import { prisma } from "@/lib/prisma";
 import FleetHeader from "./FleetHeader";
-import Reveal from "@/components/ui/Reveal";
 
 export const dynamic = "force-dynamic";
 
@@ -47,24 +46,23 @@ export default async function FleetPreview() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {cars.map((car: any, i: number) => {
+          {cars.map((car: any) => {
             const avg = car.reviews.length ? car.reviews.reduce((a: number, r: { rating: number }) => a + r.rating, 0) / car.reviews.length : null;
             return (
-              <Reveal key={car.id} delay={Math.min(i * 0.06, 0.3)}>
-                <CarCard
-                  id={car.id}
-                  brand={car.brand}
-                  model={car.model}
-                  category={car.category}
-                  pricePerDay={car.pricePerDay}
-                  image={car.images[0]?.url || "/cars/Loganblanche.png"}
-                  transmission={car.transmission}
-                  fuel={car.fuel}
-                  seats={car.seats}
-                  avgRating={avg}
-                  available={car.available}
-                />
-              </Reveal>
+              <CarCard
+                key={car.id}
+                id={car.id}
+                brand={car.brand}
+                model={car.model}
+                category={car.category}
+                pricePerDay={car.pricePerDay}
+                image={car.images[0]?.url || "/cars/Loganblanche.png"}
+                transmission={car.transmission}
+                fuel={car.fuel}
+                seats={car.seats}
+                avgRating={avg}
+                available={car.available}
+              />
             );
           })}
         </div>

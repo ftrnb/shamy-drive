@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, Fuel, Settings2, Users, Star, MapPin, MessageCircle, CalendarCheck } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import Reveal from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
 
 export default function CarDetailContent({ car, validImages, avgRating, waUrl }: { car: any; validImages: any[]; avgRating: number | null; waUrl: string }) {
@@ -46,9 +47,11 @@ export default function CarDetailContent({ car, validImages, avgRating, waUrl }:
                 {validImages.map((img: any, i: number) => (
                   <button
                     key={img.id || i}
+                    type="button"
                     onClick={() => setActive(i)}
                     aria-label={`Photo ${i + 1}`}
-                    className={cn("relative h-[72px] w-[104px] shrink-0 overflow-hidden rounded-2xl border-2 bg-white p-1.5 transition", i === active ? "border-primary" : "border-transparent hover:border-outline-variant")}
+                    aria-pressed={i === active}
+                    className={cn("relative h-[72px] w-[104px] shrink-0 overflow-hidden rounded-2xl border-2 bg-white p-1.5 transition-all duration-200 hover:scale-105 active:scale-95 dark:bg-surface-container-low", i === active ? "border-primary shadow-m3-1" : "border-transparent hover:border-outline-variant")}
                   >
                     <span className="relative block h-full w-full">
                       <Image src={img.url} alt="" fill sizes="104px" className="object-contain" />
@@ -66,7 +69,7 @@ export default function CarDetailContent({ car, validImages, avgRating, waUrl }:
                 "Climatisation",
                 "Bluetooth / USB",
               ].map((x) => (
-                <span key={x} className="inline-flex items-center gap-1.5 rounded-2xl bg-surface-container px-3 py-2.5 font-medium"><CheckCircle2 className="h-4 w-4 shrink-0 text-success" /> {x}</span>
+                <span key={x} className="inline-flex items-center gap-1.5 rounded-2xl bg-surface-container px-3 py-2.5 font-medium transition-colors duration-200 hover:bg-surface-container-high"><CheckCircle2 className="h-4 w-4 shrink-0 text-success" /> {x}</span>
               ))}
             </div>
           </div>
@@ -115,30 +118,34 @@ export default function CarDetailContent({ car, validImages, avgRating, waUrl }:
             [t("detail_flexible"), t("detail_flexible_desc")],
             [t("detail_no_hidden"), t("detail_no_hidden_desc")],
             [t("detail_support"), t("detail_support_desc")],
-          ].map(([a, b]) => (
-            <div key={a as string} className="rounded-[24px] border border-outline-variant/40 bg-surface-container-lowest p-6">
-              <CheckCircle2 className="h-6 w-6 text-primary" />
+          ].map(([a, b], i) => (
+            <Reveal key={a as string} delay={i * 0.07}>
+            <div className="h-full rounded-[24px] border border-outline-variant/40 bg-surface-container-lowest p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-m3-2">
+              <CheckCircle2 className="h-6 w-6 text-primary transition-transform duration-300 hover:scale-125" />
               <h3 className="mt-3 font-display text-[16px] font-bold">{a}</h3>
               <p className="mt-1 text-[13px] leading-6 text-on-surface-variant">{b}</p>
             </div>
+            </Reveal>
           ))}
         </div>
 
         {car.reviews.length > 0 && (
+          <Reveal>
           <div className="mt-4 rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-6 sm:p-8">
             <h3 className="font-display text-[18px] font-bold">{t("detail_reviews")} ({car.reviews.length})</h3>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {car.reviews.slice(0, 4).map((r: any) => (
-                <div key={r.id} className="rounded-2xl bg-surface-container p-4">
+                <div key={r.id} className="rounded-2xl bg-surface-container p-4 transition-all duration-200 hover:bg-surface-container-high">
                   <div className="flex items-center justify-between">
                     <span className="text-[14px] font-bold">{r.user.name || "Client vérifié"}</span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-[12px] font-bold"><Star className="h-3.5 w-3.5 fill-primary text-primary" /> {r.rating}/5</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-surface-container-lowest px-2.5 py-1 text-[12px] font-bold"><Star className="h-3.5 w-3.5 fill-primary text-primary" /> {r.rating}/5</span>
                   </div>
                   {r.comment && <p className="mt-2 text-[13px] leading-6 text-on-surface-variant">{r.comment}</p>}
                 </div>
               ))}
             </div>
           </div>
+          </Reveal>
         )}
       </section>
 

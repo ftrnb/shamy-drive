@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Home, Car, Info, MessageCircleQuestion, Mail, Menu, X, User, LogOut, LayoutDashboard } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useLanguage } from "@/lib/language-context";
@@ -27,7 +27,8 @@ export default function Navbar() {
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  const reduceMotion = useReducedMotion();
+  const supabase = useMemo(() => createClient(), []);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -39,27 +40,52 @@ export default function Navbar() {
 
   useEffect(() => {
     let alive = true;
-    supabase.auth.getUser().then(({ data }: any) => {
-      if (!alive) return;
-      setUser(data.user);
-      setLoading(false);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e: any, session: any) => {
-      setUser(session?.user ?? null);
-      if (_e === "SIGNED_IN" || _e === "SIGNED_OUT") router.refresh();
-    });
-    return () => { alive = false; subscription.unsubscribe(); };
+    supabase.auth
+      .getUser()
+      .then(({ data }: any) => {
+        if (!alive) return;
+        setUser(data?.user ?? null);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+    let subscription: { unsubscribe: () => void } | null = null;
+    try {
+      const { data } = supabase.auth.onAuthStateChange((_e: any, session: any) => {
+        if (!alive) return;
+        setUser(session?.user ?? null);
+        if (_e === "SIGNED_IN" || _e === "SIGNED_OUT") router.refresh();
+      });
+      subscription = data.subscription;
+    } catch {
+      /* auth unavailable — header stays usable */
+    }
+    return () => {
+      alive = false;
+      subscription?.unsubscribe();
+    };
   }, [supabase, router]);
 
+  // Close drawer on navigation…
   useEffect(() => {
     setOpen(false);
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
   }, [pathname]);
 
+  // …lock scroll while open, and auto-close if resized to desktop
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
-  }, [open ]);
+    if (!open) return;
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => {
+      document.body.style.overflow = "";
+      mq.removeEventListener("change", onChange);
+    };
+  }, [open]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
@@ -103,13 +129,23 @@ export default function Navbar() {
                   href={l.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative flex min-h-[44px] items-center rounded-full px-4 text-[14px] font-semibold transition-colors",
+                    "relative flex min-h-[44px] items-center rounded-full px-4 text-[14px] font-semibold transition-colors duration-200",
                     active
-                      ? scrolled ? "bg-secondary-container text-on-secondary-container" : "bg-white/15 text-white"
+                      ? scrolled ? "text-on-secondary-container" : "text-white"
                       : scrolled ? "text-on-surface-variant hover:bg-surface-container hover:text-on-surface" : "text-white/75 hover:bg-white/10 hover:text-white"
                   )}
                 >
-                  {t(l.key as any)}
+                  {active && !reduceMotion && (
+                    <motion.span
+                      layoutId="nav-active-pill"
+                      transition={{ type: "spring", damping: 32, stiffness: 420 }}
+                      className={cn("absolute inset-0 rounded-full", scrolled ? "bg-secondary-container" : "bg-white/15")}
+                    />
+                  )}
+                  {active && reduceMotion && (
+                    <span className={cn("absolute inset-0 rounded-full", scrolled ? "bg-secondary-container" : "bg-white/15")} />
+                  )}
+                  <span className="relative">{t(l.key as any)}</span>
                 </Link>
               );
             })}
@@ -152,12 +188,22 @@ export default function Navbar() {
             ) : null}
             <span className="hidden sm:block"><ThemeToggle compact /></span>
             <button
-              onClick={() => setOpen(!open)}
+              type="button"
+              onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
+              aria-controls="menu-mobile"
               aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-              className={cn("flex h-12 w-12 items-center justify-center rounded-full transition active:scale-95", scrolled ? "bg-ink text-white" : "bg-white text-ink")}
+              className={cn("flex h-12 w-12 items-center justify-center rounded-full transition active:scale-95 lg:hidden", scrolled ? "bg-ink text-white" : "bg-white text-ink")}
             >
-              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <motion.span
+                key={open ? "close" : "open"}
+                initial={reduceMotion ? false : { rotate: -70, opacity: 0, scale: 0.7 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="flex"
+              >
+                {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </motion.span>
             </button>
           </div>
         </nav>
@@ -168,6 +214,7 @@ export default function Navbar() {
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} className="fixed inset-0 z-[60] bg-scrim/50 backdrop-blur-sm lg:hidden" />
             <motion.div
+              id="menu-mobile"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
@@ -179,7 +226,7 @@ export default function Navbar() {
             >
               <div className="flex items-center justify-between bg-surface-container px-5 py-4">
                 <Image src="/shamydrive.png" alt="Shamy Drive" width={120} height={32} className="h-8 w-auto" />
-                <button onClick={() => setOpen(false)} aria-label="Fermer" className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-high">
+                <button type="button" onClick={() => setOpen(false)} aria-label="Fermer" className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-high transition active:scale-95">
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -192,9 +239,9 @@ export default function Navbar() {
                       <Link
                         href={l.href}
                         onClick={() => setOpen(false)}
-                        className={cn("mb-1 flex min-h-[56px] items-center gap-4 rounded-2xl px-4 text-[15px] font-semibold", active ? "bg-secondary-container text-on-secondary-container" : "text-on-surface hover:bg-surface-container")}
+                        className={cn("group/mitem mb-1 flex min-h-[56px] items-center gap-4 rounded-2xl px-4 text-[15px] font-semibold transition-all duration-200 active:scale-[0.99]", active ? "bg-secondary-container text-on-secondary-container" : "text-on-surface hover:translate-x-1 hover:bg-surface-container")}
                       >
-                        <span className={cn("flex h-10 w-10 items-center justify-center rounded-full", active ? "bg-white/60" : "bg-surface-container")}>
+                        <span className={cn("flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-200 group-hover/mitem:scale-110", active ? "bg-white/60" : "bg-surface-container")}>
                           <Icon className="h-5 w-5" />
                         </span>
                         {t(l.key as any)}
@@ -213,7 +260,7 @@ export default function Navbar() {
                     <Link href="/compte" onClick={() => setOpen(false)} className="flex min-h-[56px] items-center gap-3 rounded-2xl bg-ink px-4 text-[15px] font-bold text-white">
                       <User className="h-5 w-5" /> Mon compte
                     </Link>
-                    <button onClick={signOut} className="flex min-h-[48px] w-full items-center justify-center rounded-full text-[14px] font-semibold text-on-surface-variant">
+                    <button type="button" onClick={signOut} className="flex min-h-[48px] w-full items-center justify-center rounded-full text-[14px] font-semibold text-on-surface-variant transition active:scale-[0.98]">
                       Déconnexion
                     </button>
                   </>

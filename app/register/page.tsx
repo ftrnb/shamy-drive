@@ -6,7 +6,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft } from "lucide-react";
 import { MField, fieldInput } from "@/components/ui/Field";
-import { Spinner } from "@/components/ui/Motion";
+import { Spinner, easeOut } from "@/components/ui/Motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const reduce = useReducedMotion();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,7 +51,12 @@ export default function RegisterPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md rounded-[32px] border border-outline-variant/40 bg-surface-container-lowest p-7 shadow-m3-2 sm:p-9">
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 28, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.55, ease: easeOut }}
+        className="w-full max-w-md rounded-[32px] border border-outline-variant/40 bg-surface-container-lowest p-7 shadow-m3-2 sm:p-9"
+      >
         <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-surface-container px-4 text-[13px] font-bold text-on-surface-variant"><ArrowLeft className="h-4 w-4" /> Accueil</Link>
         <p className="mt-5 inline-flex rounded-full bg-primary-container px-3.5 py-1.5 text-[12px] font-bold text-on-primary-container">Shamy Drive</p>
         <h1 className="mt-3 font-display text-[30px] font-bold">Créer un compte</h1>
@@ -67,7 +74,7 @@ export default function RegisterPage() {
         </form>
 
         <p className="mt-5 text-center text-[14px] text-on-surface-variant">Déjà inscrit ? <Link href="/login" className="font-bold text-primary hover:underline">Se connecter</Link></p>
-      </div>
+      </motion.div>
     </main>
   );
 }

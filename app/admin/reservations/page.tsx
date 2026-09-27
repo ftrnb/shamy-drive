@@ -17,13 +17,13 @@ export default async function AdminReservationsPage({ searchParams }: { searchPa
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase">Réservations</h1>
-      <p className="mt-1 text-sm text-zinc-500">{bookings.length} résultats</p>
+      <h1 className="font-display text-[28px] font-bold tracking-tight">Réservations</h1>
+      <p className="mt-1 text-[14px] text-on-surface-variant">{bookings.length} résultats</p>
 
-      <div className="mt-4 flex gap-2">
-        <a href="/admin/reservations" className={`px-4 py-2 text-xs font-bold border ${!sp.status ? "bg-black text-white border-black" : "bg-white border-zinc-300"}`}>Toutes</a>
+      <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1">
+        <a href="/admin/reservations" className={`shrink-0 rounded-full border px-4 py-2.5 text-[12px] font-bold transition-all duration-200 hover:-translate-y-0.5 active:scale-95 ${!sp.status ? "border-transparent bg-ink text-white shadow-m3-1" : "border-outline-variant bg-surface-container-lowest text-on-surface hover:border-outline"}`}>Toutes</a>
         {["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"].map((s) => (
-          <a key={s} href={`/admin/reservations?status=${s}`} className={`px-4 py-2 text-xs font-bold border ${sp.status === s ? "bg-[#C1272D] text-white border-[#C1272D]" : "bg-white border-zinc-300"}`}>{s}</a>
+          <a key={s} href={`/admin/reservations?status=${s}`} className={`shrink-0 rounded-full border px-4 py-2.5 text-[12px] font-bold transition-all duration-200 hover:-translate-y-0.5 active:scale-95 ${sp.status === s ? "border-transparent bg-primary text-white shadow-m3-1" : "border-outline-variant bg-surface-container-lowest text-on-surface hover:border-outline"}`}>{s}</a>
         ))}
       </div>
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail, Clock, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import Reveal from "@/components/ui/Reveal";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -11,21 +12,23 @@ export default function Footer() {
     <footer className="bg-ink text-white">
       <div className="mx-auto max-w-6xl px-5 pb-28 pt-14 md:pb-14 lg:px-8">
         {/* CTA card */}
-        <div className="flex flex-col gap-5 rounded-[28px] bg-primary p-7 sm:p-9 md:flex-row md:items-center md:justify-between">
+        <Reveal>
+        <div className="group flex flex-col gap-5 rounded-[28px] bg-primary p-7 transition-shadow duration-300 hover:shadow-m3-4 sm:p-9 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-[13px] font-bold uppercase tracking-widest text-white/70">Agadir • Livraison aéroport</p>
             <h3 className="mt-2 font-display text-[26px] font-bold leading-tight sm:text-[32px]">Besoin d’une voiture cette semaine ?</h3>
             <p className="mt-2 max-w-md text-[14px] leading-6 text-white/80">Prix nets en DH, kilométrage illimité, paiement à la livraison.</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row md:flex-col lg:flex-row">
-            <Link href="/voitures" className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-white px-7 text-[14px] font-bold text-ink transition hover:bg-surface-container-low active:scale-[0.98]">
-              Voir les voitures <ArrowUpRight className="h-4 w-4" />
+            <Link href="/voitures" className="group/link inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-white px-7 text-[14px] font-bold text-ink transition hover:bg-surface-container-low active:scale-[0.98]">
+              Voir les voitures <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
             </Link>
-            <a href="https://wa.me/212661689659" target="_blank" rel="noopener" className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/30 px-7 text-[14px] font-bold text-white transition hover:bg-white/10">
+            <a href="https://wa.me/212661689659" target="_blank" rel="noopener" className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/30 px-7 text-[14px] font-bold text-white transition hover:bg-white/10 active:scale-[0.98]">
               WhatsApp
             </a>
           </div>
         </div>
+        </Reveal>
 
         <div className="mt-12 grid gap-10 md:grid-cols-[1.2fr_0.8fr_0.8fr_1fr]">
           <div>
@@ -45,7 +48,7 @@ export default function Footer() {
                 ["/contact", t("nav_contact" as any)],
               ].map(([href, label]) => (
                 <li key={href as string}>
-                  <Link href={href as string} className="inline-flex min-h-[40px] items-center rounded-lg px-1 text-white/75 transition hover:text-white">{label as string}</Link>
+                  <Link href={href as string} className="link-underline inline-flex min-h-[40px] items-center px-1 text-white/75 transition hover:text-white">{label as string}</Link>
                 </li>
               ))}
             </ul>

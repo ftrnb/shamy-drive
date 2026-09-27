@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import Reveal from "@/components/ui/Reveal";
 
 type FAQItem = { q: string; a: string };
 type FAQCategory = { id: string; icon: React.ElementType; label: string; labelEn: string; items: FAQItem[]; itemsEn: FAQItem[] };
@@ -305,7 +306,7 @@ const categories: FAQCategory[] = [
       },
       {
         q: "Si l'assistant ne comprend pas ?",
-        a: "Reformulez plus simplement, consultez cette FAQ ou contactez-nous via WhatsApp / Contact. L'équipe prend le relais en <1h.",
+        a: "Reformulez plus simplement, consultez cette FAQ ou contactez-nous via WhatsApp / Contact. L'équipe prend le relais.",
       },
     ],
     itemsEn: [
@@ -323,7 +324,7 @@ const categories: FAQCategory[] = [
       },
       {
         q: "If the assistant doesn't understand?",
-        a: "Rephrase simply, check this FAQ or reach us on WhatsApp / Contact. The team takes over within 1h.",
+        a: "Rephrase simply, check this FAQ or reach us on WhatsApp / Contact. The team takes over.",
       },
     ],
   },
@@ -335,7 +336,7 @@ const categories: FAQCategory[] = [
     items: [
       {
         q: "Contacter sur WhatsApp ?",
-        a: "Oui via le bouton du site avec message pré-rempli. Numéro : +212 6 61 68 96 59. Réponse en <1h en horaires bureau, idéal pour urgences en location.",
+        a: "Oui via le bouton du site avec message pré-rempli. Numéro : +212 6 61 68 96 59. Réponse en horaires bureau, idéal pour urgences en location.",
       },
       {
         q: "WhatsApp ou chatbot ?",
@@ -349,7 +350,7 @@ const categories: FAQCategory[] = [
     itemsEn: [
       {
         q: "Contact on WhatsApp?",
-        a: "Yes via the site button with pre-filled message. Number: +212 6 61 68 96 59. Reply within 1h during office hours, ideal for rental emergencies.",
+        a: "Yes via the site button with pre-filled message. Number: +212 6 61 68 96 59. Reply during office hours, ideal for rental emergencies.",
       },
       {
         q: "WhatsApp or chatbot?",
@@ -470,7 +471,7 @@ export default function FAQContent() {
                 <a
                   key={c.id}
                   href={`#${c.id}`}
-                  className="whitespace-nowrap rounded-full border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-[13px] font-bold text-on-surface transition hover:border-ink"
+                  className="whitespace-nowrap rounded-full border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-[13px] font-bold text-on-surface transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-m3-1 active:scale-95"
                 >
                   {label}
                 </a>
@@ -491,13 +492,14 @@ export default function FAQContent() {
                 (cat as unknown as { _filtered?: FAQItem[] })._filtered ?? (isFr ? cat.items : cat.itemsEn);
               if (items.length === 0) return null;
               return (
-                <div key={cat.id} id={cat.id} className="scroll-mt-28">
-                  <div className="flex items-center gap-3 rounded-[20px] bg-surface-container px-5 py-4">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-ink text-white">
+                <Reveal key={cat.id}>
+                <div id={cat.id} className="scroll-mt-28">
+                  <div className="flex items-center gap-3 rounded-[20px] bg-surface-container px-5 py-4 transition-colors duration-300">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-ink text-white transition-transform duration-300 hover:scale-110 hover:rotate-6">
                       <Icon className="h-4 w-4" />
                     </span>
                     <h2 className="text-sm font-black uppercase tracking-widest">{label}</h2>
-                    <span className="ml-auto text-xs font-bold text-zinc-500">{items.length}</span>
+                    <span className="ml-auto rounded-full bg-surface-container-lowest px-2.5 py-1 text-xs font-bold text-on-surface-variant">{items.length}</span>
                   </div>
                   <div className="mt-3 space-y-2.5">
                     {items.map((f) => {
@@ -514,28 +516,29 @@ export default function FAQContent() {
                             if (target.open) setOpenKey(key);
                             else if (openKey === key) setOpenKey(null);
                           }}
-                          className="group overflow-hidden rounded-[20px] border border-outline-variant/50 bg-surface-container-lowest open:shadow-m3-1"
+                          className="group overflow-hidden rounded-[20px] border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 hover:border-outline hover:shadow-m3-1 open:shadow-m3-1"
                         >
                           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-[15px] font-bold leading-6">
                             <span>{f.q}</span>
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary transition group-open:rotate-45 group-open:bg-ink group-open:text-white">
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary transition-all duration-300 group-open:rotate-45 group-open:bg-ink group-open:text-white">
                               +
                             </span>
                           </summary>
-                          <p className="px-5 pb-5 text-sm leading-7 text-zinc-600">{f.a}</p>
+                          <p className="faq-answer px-5 pb-5 text-sm leading-7 text-on-surface-variant">{f.a}</p>
                         </details>
                       );
                     })}
                   </div>
                 </div>
+                </Reveal>
               );
             })}
             {filtered.length === 0 && (
-              <div className="border border-zinc-200 bg-zinc-50 p-10 text-center">
-                <p className="text-sm font-bold uppercase text-zinc-700">
+              <div className="rounded-[28px] border border-dashed border-outline-variant bg-surface-container-lowest p-10 text-center">
+                <p className="font-display text-[16px] font-bold">
                   {isFr ? "Aucun résultat" : "No results"}
                 </p>
-                <p className="mt-2 text-sm text-zinc-500">
+                <p className="mt-2 text-sm text-on-surface-variant">
                   {isFr ? "Essayez un autre mot-clé ou contactez-nous." : "Try another keyword or contact us."}
                 </p>
               </div>
@@ -543,23 +546,24 @@ export default function FAQContent() {
           </div>
 
           {/* Sidebar CTA */}
+          <Reveal delay={0.1}>
           <aside className="space-y-4 lg:sticky lg:top-32 lg:self-start">
-            <div className="border border-zinc-200 bg-white p-6">
-              <p className="text-xs font-black uppercase tracking-widest text-[#C1272D]">
+            <div className="rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-6 shadow-m3-1 transition-shadow duration-300 hover:shadow-m3-2">
+              <p className="text-[12px] font-bold uppercase tracking-widest text-primary">
                 {isFr ? "Besoin d'aide ?" : "Need help?"}
               </p>
-              <h3 className="mt-2 text-base font-black uppercase leading-6">
+              <h3 className="mt-2 font-display text-[18px] font-bold leading-snug">
                 {isFr ? "On te répond vite." : "We reply fast."}
               </h3>
-              <p className="mt-2 text-sm leading-6 text-zinc-600">
+              <p className="mt-2 text-[13px] leading-6 text-on-surface-variant">
                 {isFr
-                  ? "Shamy IA pour explorer, WhatsApp pour l'urgent. L'équipe confirme en <1h."
-                  : "Shamy AI to explore, WhatsApp for urgent. Team confirms within 1h."}
+                  ? "Shamy IA pour explorer, WhatsApp pour l'urgent. L'équipe confirme chaque demande."
+                  : "Shamy AI to explore, WhatsApp for urgent. The team confirms every request."}
               </p>
-              <div className="mt-5 space-y-3">
+              <div className="mt-5 space-y-2.5">
                 <Link
                   href="/contact"
-                  className="block bg-black px-5 py-3 text-center text-xs font-black uppercase tracking-widest text-white hover:bg-zinc-800 transition"
+                  className="flex min-h-[52px] items-center justify-center rounded-full bg-ink px-5 text-[14px] font-bold text-white transition hover:bg-primary active:scale-[0.98]"
                 >
                   {isFr ? "Contact" : "Contact us"}
                 </Link>
@@ -567,23 +571,23 @@ export default function FAQContent() {
                   href="https://wa.me/212661689659"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 border border-[#C1272D] bg-white px-5 py-3 text-xs font-black uppercase tracking-widest text-[#C1272D] hover:bg-[#C1272D] hover:text-white transition"
+                  className="flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-success-container px-5 text-[14px] font-bold text-on-success-container transition hover:brightness-95 active:scale-[0.98]"
                 >
-                  <MessageCircle className="h-4 w-4" />
+                  <MessageCircle className="h-4 w-4 transition-transform duration-300 hover:scale-125 hover:-rotate-12" />
                   WhatsApp
                 </a>
                 <Link
                   href="/voitures"
-                  className="block text-center text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-black"
+                  className="link-underline block pt-1 text-center text-[13px] font-bold text-on-surface-variant hover:text-on-surface"
                 >
                   {isFr ? "Voir les véhicules →" : "View cars →"}
                 </Link>
               </div>
             </div>
 
-            <div className="border border-zinc-200 bg-zinc-50 p-5">
-              <p className="text-xs font-black uppercase tracking-widest">Shamy Drive</p>
-              <p className="mt-2 text-xs leading-5 text-zinc-600">
+            <div className="rounded-[24px] bg-surface-container p-5 transition-colors duration-300">
+              <p className="text-[12px] font-bold uppercase tracking-widest text-on-surface-variant">Shamy Drive</p>
+              <p className="mt-2 text-[12px] leading-5 text-on-surface-variant">
                 {isFr
                   ? "Agadir • Aéroport Al Massira • Taghazout • Tamraght • Aourir. Livraison côte Atlantique. Paiement à la livraison • Km illimité."
                   : "Agadir • Al Massira Airport • Taghazout • Tamraght • Aourir. Atlantic coast delivery. Pay on delivery • Unlimited mileage."}
@@ -608,6 +612,7 @@ export default function FAQContent() {
               }}
             />
           </aside>
+          </Reveal>
         </div>
       </section>
     </>

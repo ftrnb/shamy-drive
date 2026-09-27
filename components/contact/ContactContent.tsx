@@ -4,6 +4,7 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import ContactForm from "./ContactForm";
 import { Eyebrow } from "@/components/ui/M3";
+import Reveal from "@/components/ui/Reveal";
 
 export default function ContactContent() {
   const { t } = useLanguage();
@@ -23,7 +24,8 @@ export default function ContactContent() {
 
       <section className="mx-auto grid max-w-6xl gap-4 px-3 py-6 sm:px-5 lg:grid-cols-[1fr_1fr]">
         <div className="space-y-4">
-          <div className="rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-6 shadow-m3-1 sm:p-7">
+          <Reveal>
+          <div className="rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest p-6 shadow-m3-1 transition-shadow duration-300 hover:shadow-m3-2 sm:p-7">
             <h2 className="font-display text-[18px] font-bold">{t("contact_coords")}</h2>
             <ul className="mt-4 space-y-3 text-[14px]">
               <li className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-container"><MapPin className="h-5 w-5 text-on-primary-container" /></span><span>Agadir, Maroc — livraison aéroport Al Massira, hôtels, domicile</span></li>
@@ -32,9 +34,12 @@ export default function ContactContent() {
               <li className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-tertiary-container"><Clock className="h-5 w-5 text-on-tertiary-container" /></span>7j/7 — 08:00 à 22:00 (assistance pendant la location)</li>
             </ul>
           </div>
-          <div className="overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest">
+          </Reveal>
+          <Reveal delay={0.08}>
+          <div className="overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest transition-shadow duration-300 hover:shadow-m3-2">
             <iframe title="Agadir" src="https://maps.google.com/maps?q=Agadir&t=&z=12&ie=UTF8&iwloc=&output=embed" className="aspect-[16/9] h-full w-full border-0" loading="lazy" />
           </div>
+          </Reveal>
         </div>
         <ContactForm />
       </section>

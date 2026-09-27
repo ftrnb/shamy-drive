@@ -2,50 +2,66 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Spinner } from "@/components/ui/Motion";
+import { toast } from "@/components/ui/Toaster";
+import { cn } from "@/lib/utils";
 
 export default function AdminUsersClient({ users }: { users: any[] }) {
   const router = useRouter();
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   async function toggleRole(user: any) {
     const newRole = user.role === "ADMIN" ? "USER" : "ADMIN";
-    if (!confirm(`Passer ${user.email} en ${newRole} ?`)) return;
     setLoadingId(user.id);
-    const res = await fetch("/api/admin/users", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: user.id, role: newRole }) });
-    const data = await res.json();
-    setLoadingId(null);
-    if (!res.ok) {
-      alert(data.error || "Erreur");
-      return;
+    try {
+      const res = await fetch("/api/admin/users", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: user.id, role: newRole }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur");
+      setConfirmId(null);
+      toast(`${user.email} → ${newRole}`);
+      router.refresh();
+    } catch (err: any) {
+      toast(err.message, { tone: "error" });
+    } finally {
+      setLoadingId(null);
     }
-    router.refresh();
   }
 
   return (
-    <div className="overflow-x-auto border border-zinc-200 bg-white">
-      <table className="w-full text-sm">
-        <thead className="bg-zinc-50 text-xs uppercase tracking-wider text-zinc-500">
+    <div className="overflow-x-auto rounded-[24px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1">
+      <table className="w-full text-[13px]">
+        <thead className="bg-surface-container text-[11px] uppercase tracking-widest text-on-surface-variant">
           <tr>
-            <th className="px-4 py-3 text-left">Utilisateur</th>
-            <th className="px-4 py-3 text-left">Email</th>
-            <th className="px-4 py-3 text-left">Rôle</th>
-            <th className="px-4 py-3 text-left">Réservations</th>
-            <th className="px-4 py-3 text-left">Créé</th>
-            <th className="px-4 py-3 text-right">Action</th>
+            <th className="px-4 py-3.5 text-left font-bold">Utilisateur</th>
+            <th className="px-4 py-3.5 text-left font-bold">Email</th>
+            <th className="px-4 py-3.5 text-left font-bold">Rôle</th>
+            <th className="px-4 py-3.5 text-left font-bold">Résas</th>
+            <th className="px-4 py-3.5 text-left font-bold">Créé</th>
+            <th className="px-4 py-3.5 text-right font-bold">Action</th>
           </tr>
         </thead>
         <tbody>
           {users.map((u) => (
-            <tr key={u.id} className="border-t border-zinc-100">
-              <td className="px-4 py-3 font-bold">{u.name || "—"}</td>
-              <td className="px-4 py-3 text-zinc-600">{u.email}</td>
-              <td className="px-4 py-3"><span className={`px-2 py-1 text-[10px] font-black uppercase ${u.role === "ADMIN" ? "bg-[#C1272D] text-white" : "bg-zinc-100 text-zinc-700"}`}>{u.role}</span></td>
-              <td className="px-4 py-3">{u._count.bookings}</td>
-              <td className="px-4 py-3 text-zinc-500">{new Date(u.createdAt).toLocaleDateString("fr-MA")}</td>
-              <td className="px-4 py-3 text-right">
-                <button onClick={() => toggleRole(u)} disabled={loadingId === u.id} className="border border-zinc-300 px-3 py-1.5 text-xs font-bold hover:border-black disabled:opacity-50">
-                  {u.role === "ADMIN" ? "Rétrograder" : "Promouvoir"}
-                </button>
+            <tr key={u.id} className="admin-row border-t border-outline-variant/40">
+              <td className="px-4 py-3.5 font-bold">{u.name || "—"}</td>
+              <td className="max-w-[220px] truncate px-4 py-3.5 text-on-surface-variant">{u.email}</td>
+              <td className="px-4 py-3.5"><span className={cn("rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest", u.role === "ADMIN" ? "bg-primary text-white" : "bg-surface-container-high text-on-surface-variant")}>{u.role}</span></td>
+              <td className="px-4 py-3.5 font-bold">{u._count.bookings}</td>
+              <td className="px-4 py-3.5 text-on-surface-variant">{new Date(u.createdAt).toLocaleDateString("fr-MA")}</td>
+              <td className="px-4 py-3.5 text-right">
+                {confirmId === u.id ? (
+                  <span className="inline-flex gap-1.5">
+                    <button type="button" onClick={() => toggleRole(u)} disabled={loadingId === u.id} className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-primary px-3.5 text-[12px] font-bold text-white transition active:scale-95 disabled:opacity-50">
+                      {loadingId === u.id ? <Spinner className="h-3.5 w-3.5" /> : null}Oui
+                    </button>
+                    <button type="button" onClick={() => setConfirmId(null)} className="inline-flex min-h-[40px] items-center rounded-full bg-surface-container px-3.5 text-[12px] font-bold transition active:scale-95">Non</button>
+                  </span>
+                ) : (
+                  <button type="button" onClick={() => setConfirmId(u.id)} disabled={loadingId === u.id} className="inline-flex min-h-[40px] items-center rounded-full border border-outline-variant px-3.5 text-[12px] font-bold transition hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50">
+                    {u.role === "ADMIN" ? "Rétrograder" : "Promouvoir"}
+                  </button>
+                )}
               </td>
             </tr>
           ))}

@@ -31,11 +31,14 @@ export default async function ComptePage() {
   return (
     <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
-      <div className="bg-[#0A0A0A] px-6 pb-8 pt-24 text-white">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C1272D]">Mon compte</p>
-          <h1 className="mt-2 text-3xl font-black uppercase sm:text-4xl">Bonjour, {user.user_metadata?.full_name || user.email}</h1>
-          <p className="mt-2 text-sm text-zinc-400">{user.email} • {bookings.length} réservation(s)</p>
+      <div className="px-3 pt-24 sm:px-5 sm:pt-28">
+        <div className="mx-auto max-w-6xl rounded-[32px] bg-ink p-7 text-white shadow-m3-2 sm:p-8">
+          <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-[12px] font-bold text-white/85">
+            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-tertiary-container" />
+            Mon compte
+          </p>
+          <h1 className="mt-3 font-display text-[28px] font-bold leading-tight sm:text-[36px]">Bonjour, {user.user_metadata?.full_name || user.email}</h1>
+          <p className="mt-2 text-[13px] text-white/60">{user.email} • {bookings.length} réservation(s)</p>
         </div>
       </div>
       <section className="mx-auto max-w-6xl px-3 py-6 sm:px-5">

@@ -1,10 +1,37 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useInView, animate } from "framer-motion";
 import * as React from "react";
 
 export const EASE = [0.05, 0.7, 0.1, 1] as const;
 export const easeOut = [...EASE] as unknown as [number, number, number, number];
+
+/** Animated counter — counts up when scrolled into view. */
+export function CountUp({ value, suffix = "", className }: { value: number; suffix?: string; className?: string }) {
+  const ref = React.useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const [display, setDisplay] = React.useState(0);
+  const reduce = useReducedMotion();
+  React.useEffect(() => {
+    if (!inView) return;
+    if (reduce) {
+      setDisplay(value);
+      return;
+    }
+    const controls = animate(0, value, {
+      duration: 1.2,
+      ease: easeOut,
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    });
+    return () => controls.stop();
+  }, [inView, value, reduce]);
+  return (
+    <span ref={ref} className={className}>
+      {display.toLocaleString("fr-MA")}
+      {suffix}
+    </span>
+  );
+}
 
 /** Image with blur-up fade + shimmer placeholder. Perfect visual feedback on slow networks. */
 export function FadeImage({
