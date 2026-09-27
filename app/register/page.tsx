@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft } from "lucide-react";
 import { MField, fieldInput } from "@/components/ui/Field";
+import { Spinner } from "@/components/ui/Motion";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -59,7 +60,8 @@ export default function RegisterPage() {
           <MField label="Email"><input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className={fieldInput} placeholder="toi@email.com" autoComplete="email" /></MField>
           <MField label="Mot de passe"><input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required minLength={8} className={fieldInput} placeholder="8 caractères minimum" autoComplete="new-password" /></MField>
           {error && <p role="alert" className="rounded-2xl bg-error-container/60 px-4 py-3 text-[13px] font-semibold text-error">{typeof error === "string" ? error : JSON.stringify(error)}</p>}
-          <button type="submit" disabled={loading} className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-primary text-[15px] font-bold text-white shadow-m3-1 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50">
+          <button type="submit" disabled={loading} className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-primary text-[15px] font-bold text-white shadow-m3-1 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50">
+            {loading ? <Spinner /> : null}
             {loading ? "Création..." : "Créer mon compte"}
           </button>
         </form>
