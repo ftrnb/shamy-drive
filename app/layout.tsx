@@ -8,7 +8,7 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   title: { default: "Shamy Drive — Location premium à Agadir", template: "%s | Shamy Drive" },
-  description: "Louez votre voiture à Agadir avec Shamy Drive. Flotte premium, prix transparents, assistance 24/7. Berlines, SUV, citadines dès 250 DH/jour.",
+  description: "Louez votre voiture à Agadir avec Shamy Drive. Flotte réelle, prix nets en DH dès 250/jour, kilométrage illimité. Citadines, berlines, SUV.",
   openGraph: {
     title: "Shamy Drive — Location premium à Agadir",
     description: "Votre route. Votre style. Location de véhicules à Agadir.",
@@ -28,12 +28,20 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#fff8f6",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fff8f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#141210" },
+  ],
 };
+
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('shamy-theme')||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className={`${archivo.variable} ${inter.variable} antialiased`}>
         <a href="#contenu" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-5 focus:py-3 focus:text-sm focus:font-bold focus:text-white">
           Aller au contenu

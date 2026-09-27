@@ -18,17 +18,17 @@ export default function MobileNav() {
   ];
 
   return (
-    <nav aria-label="Navigation rapide" className="fixed inset-x-3 bottom-[max(12px,env(safe-area-inset-bottom))] z-40 md:hidden">
+    <nav aria-label="Navigation rapide" className="animate-m3-rise fixed inset-x-3 bottom-[max(12px,env(safe-area-inset-bottom))] z-40 md:hidden">
       <div className="mx-auto grid max-w-md grid-cols-3 gap-1 rounded-full border border-outline-variant/40 bg-surface-container-lowest/95 p-1.5 shadow-m3-3 backdrop-blur-xl">
         {items.map((it) => {
           const Icon = it.icon;
           const cls = cn(
-            "flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-full text-[11px] font-bold transition-all",
+            "flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-full text-[11px] font-bold transition-all duration-200 active:scale-95",
             it.active ? "bg-secondary-container text-on-secondary-container" : "text-on-surface-variant active:bg-surface-container"
           );
           const inner = (
             <>
-              <Icon className="h-5 w-5" />
+              <Icon className={cn("h-5 w-5 transition-transform duration-200", it.active && "scale-110")} />
               {it.label}
             </>
           );

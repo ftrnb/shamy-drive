@@ -1,9 +1,9 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
 import { Users, Fuel, Settings2, ArrowRight, Star } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import { FadeImage } from "@/components/ui/Motion";
 import { cn } from "@/lib/utils";
 
 interface CarCardProps {
@@ -22,20 +22,15 @@ interface CarCardProps {
 
 export default function CarCard({ id, brand, model, category, pricePerDay, image, transmission, fuel, seats, avgRating, available = true }: CarCardProps) {
   const { t } = useLanguage();
-  const [imgError, setImgError] = React.useState(false);
-  const imgSrc = imgError || !image ? "/cars/Loganblanche.png" : image;
+  const imgSrc = !image ? "/cars/Loganblanche.png" : image;
 
   return (
-    <article className="m3-card-hover group flex flex-col overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1 hover:shadow-m3-3">
+    <article className="m3-card-hover group flex flex-col overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1 transition-colors duration-300 hover:shadow-m3-3">
       <Link href={`/voitures/${id}`} className="block focus:outline-none" aria-label={`${brand} ${model} — ${pricePerDay} DH par jour`}>
         <div className="img-fade relative aspect-[16/10] overflow-hidden p-5">
-          <img
-            src={imgSrc}
-            alt={`${brand} ${model}`}
-            className="h-full w-full object-contain drop-shadow-xl transition-transform duration-500 group-hover:scale-[1.04]"
-            loading="lazy"
-            onError={() => setImgError(true)}
-          />
+          <div className="h-full w-full transition-transform duration-500 group-hover:scale-[1.04]">
+            <FadeImage src={imgSrc} alt={`${brand} ${model}`} className="object-contain drop-shadow-xl" />
+          </div>
           <div className="absolute left-4 top-4 flex gap-1.5">
             <span className="rounded-full bg-ink px-3 py-1.5 text-[11px] font-bold text-white">{category}</span>
             {!available && <span className="rounded-full bg-error px-3 py-1.5 text-[11px] font-bold text-white">Indisponible</span>}
@@ -71,13 +66,13 @@ export default function CarCard({ id, brand, model, category, pricePerDay, image
         </div>
 
         <div className="mt-3 flex items-center gap-2 text-[12px] font-semibold">
-          <span className={cn("h-2 w-2 rounded-full", available ? "bg-success" : "bg-outline")} />
+          <span className={cn("h-2 w-2 rounded-full", available ? "bg-success animate-pulse-dot" : "bg-outline")} />
           <span className={available ? "text-success" : "text-outline"}>{available ? t("common_now") : t("common_on_request")}</span>
         </div>
 
         <Link href={`/voitures/${id}`} className="m3-state-layer mt-4 flex min-h-[52px] w-full items-center justify-between rounded-full bg-secondary-container px-5 text-[14px] font-bold text-on-secondary-container transition active:scale-[0.98]">
           <span>{t("common_view_vehicle")}</span>
-          <ArrowRight className="h-5 w-5" />
+          <ArrowRight className="arrow-nudge h-5 w-5" />
         </Link>
       </div>
     </article>

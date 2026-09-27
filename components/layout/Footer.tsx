@@ -13,9 +13,9 @@ export default function Footer() {
         {/* CTA card */}
         <div className="flex flex-col gap-5 rounded-[28px] bg-primary p-7 sm:p-9 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-[13px] font-bold uppercase tracking-widest text-white/70">Agadir • Aéroport en 30 min</p>
+            <p className="text-[13px] font-bold uppercase tracking-widest text-white/70">Agadir • Livraison aéroport</p>
             <h3 className="mt-2 font-display text-[26px] font-bold leading-tight sm:text-[32px]">Besoin d’une voiture cette semaine ?</h3>
-            <p className="mt-2 max-w-md text-[14px] leading-6 text-white/80">Prix nets en DH, kilométrage illimité, paiement à la livraison. Réponse en moins de 2h.</p>
+            <p className="mt-2 max-w-md text-[14px] leading-6 text-white/80">Prix nets en DH, kilométrage illimité, paiement à la livraison.</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row md:flex-col lg:flex-row">
             <Link href="/voitures" className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-white px-7 text-[14px] font-bold text-ink transition hover:bg-surface-container-low active:scale-[0.98]">

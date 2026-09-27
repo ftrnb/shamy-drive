@@ -8,6 +8,8 @@ import { CalendarDays, CheckCircle2, MapPin, User, Phone, Mail, Clock, Upload, F
 import { calculateDays } from "@/lib/utils";
 import { useLanguage } from "@/lib/language-context";
 import { MField, fieldInput } from "@/components/ui/Field";
+import { Spinner } from "@/components/ui/Motion";
+import { toast } from "@/components/ui/Toaster";
 import { cn } from "@/lib/utils";
 
 function getToday() {
@@ -106,6 +108,7 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Réservation échouée"); return; }
       setSuccess(`${t("reservation_success")} Réf: ${data.booking.id.slice(0, 8).toUpperCase()}`);
+      toast(t("reservation_success"), { desc: `${car.brand} ${car.model} • ${booking.days} j — ${booking.total} DH` });
       setTimeout(() => router.push("/compte"), 1800);
     } catch {
       setError(lang === "fr" ? "Erreur réseau" : "Network error");
@@ -139,8 +142,8 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
             <div className="mt-4 grid grid-cols-3 gap-2 text-center">
               {[
                 [Shield, lang === "fr" ? "Vérifié" : "Checked"],
-                [Clock, lang === "fr" ? "30 min" : "30 min"],
-                [CheckCircle2, "24/7"],
+                [MapPin, lang === "fr" ? "Livraison" : "Delivery"],
+                [CheckCircle2, lang === "fr" ? "Sans acompte" : "No deposit"],
               ].map(([Icon, label]: any, i: number) => (
                 <div key={i} className="rounded-2xl border border-outline-variant/40 px-2 py-3">
                   <Icon className="mx-auto h-5 w-5 text-primary" />
@@ -259,15 +262,16 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
                 Continuer <ArrowRight className="h-5 w-5" />
               </button>
             ) : (
-              <button type="submit" disabled={loading || !booking.valid || uploadingId} className={cn("flex h-[56px] flex-1 items-center justify-center rounded-full text-[15px] font-bold transition active:scale-[0.98]", booking.valid ? "bg-primary text-white shadow-m3-1 hover:brightness-110" : "cursor-not-allowed bg-surface-container text-outline")}>
-                {!user ? t("reservation_login_required") : loading ? "..." : t("reservation_submit")}
+              <button type="submit" disabled={loading || !booking.valid || uploadingId} className={cn("flex h-[56px] flex-1 items-center justify-center gap-2 rounded-full text-[15px] font-bold transition active:scale-[0.98]", booking.valid ? "bg-primary text-white shadow-m3-1 hover:brightness-110" : "cursor-not-allowed bg-surface-container text-outline")}>
+                {loading ? <Spinner /> : null}
+                {!user ? t("reservation_login_required") : loading ? (lang === "fr" ? "Envoi..." : "Sending...") : t("reservation_submit")}
               </button>
             )}
           </div>
           <a href={waUrl} target="_blank" rel="noopener noreferrer" className="mt-2.5 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-success-container px-6 text-[14px] font-bold text-on-success-container transition hover:brightness-95">
             <MessageCircle className="h-5 w-5" /> {t("reservation_whatsapp")}
           </a>
-          <p className="mt-3 flex gap-2 text-[12px] leading-5 text-outline"><Clock className="h-4 w-4 shrink-0 text-primary" /> {lang === "fr" ? "Confirmation sous 2h ouvrées. Paiement à la livraison." : "Confirmed within 2h. Pay on delivery."}</p>
+          <p className="mt-3 flex gap-2 text-[12px] leading-5 text-outline"><Clock className="h-4 w-4 shrink-0 text-primary" /> {lang === "fr" ? "Confirmation par l'équipe. Paiement à la livraison." : "Confirmed by the team. Pay on delivery."}</p>
         </div>
       </form>
     </div>

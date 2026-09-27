@@ -9,6 +9,7 @@ import { Home, Car, Info, MessageCircleQuestion, Mail, Menu, X, User, LogOut, La
 import { createClient } from "@/lib/supabase/client";
 import { useLanguage } from "@/lib/language-context";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ThemeToggle from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -149,11 +150,12 @@ export default function Navbar() {
                 </Link>
               </>
             ) : null}
+            <span className="hidden sm:block"><ThemeToggle compact /></span>
             <button
               onClick={() => setOpen(!open)}
               aria-expanded={open}
               aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-              className={cn("flex h-12 w-12 items-center justify-center rounded-full transition", scrolled ? "bg-ink text-white" : "bg-white text-ink")}
+              className={cn("flex h-12 w-12 items-center justify-center rounded-full transition active:scale-95", scrolled ? "bg-ink text-white" : "bg-white text-ink")}
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -202,7 +204,10 @@ export default function Navbar() {
                 })}
               </div>
               <div className="space-y-2 border-t border-outline-variant/50 bg-surface-container-low p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-                <div className="flex justify-center pb-1 md:hidden"><LanguageSwitcher /></div>
+                <div className="flex items-center justify-between gap-2 pb-1">
+                  <div className="md:hidden"><LanguageSwitcher /></div>
+                  <ThemeToggle compact />
+                </div>
                 {user ? (
                   <>
                     <Link href="/compte" onClick={() => setOpen(false)} className="flex min-h-[56px] items-center gap-3 rounded-2xl bg-ink px-4 text-[15px] font-bold text-white">

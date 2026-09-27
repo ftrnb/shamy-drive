@@ -85,7 +85,7 @@ const categories: FAQCategory[] = [
       },
       {
         q: "Combien de temps prend une réservation ?",
-        a: "En général moins de deux minutes une fois vos dates connues. Saisie minimale, vérification instantanée de disponibilité et confirmation sous 2h ouvrées par l'équipe.",
+        a: "En général moins de deux minutes une fois vos dates connues. Saisie minimale, vérification instantanée de disponibilité et confirmation par l'équipe dès validation.",
       },
     ],
     itemsEn: [
@@ -585,8 +585,8 @@ export default function FAQContent() {
               <p className="text-xs font-black uppercase tracking-widest">Shamy Drive</p>
               <p className="mt-2 text-xs leading-5 text-zinc-600">
                 {isFr
-                  ? "Agadir • Aéroport Al Massira • Taghazout • Tamraght • Aourir. Livraison côte Atlantique. Paiement à la livraison • Km illimité • 24/7."
-                  : "Agadir • Al Massira Airport • Taghazout • Tamraght • Aourir. Atlantic coast delivery. Pay on delivery • Unlimited mileage • 24/7."}
+                  ? "Agadir • Aéroport Al Massira • Taghazout • Tamraght • Aourir. Livraison côte Atlantique. Paiement à la livraison • Km illimité."
+                  : "Agadir • Al Massira Airport • Taghazout • Tamraght • Aourir. Atlantic coast delivery. Pay on delivery • Unlimited mileage."}
               </p>
             </div>
 

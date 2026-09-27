@@ -29,7 +29,7 @@ export default function ContactContent() {
               <li className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-container"><MapPin className="h-5 w-5 text-on-primary-container" /></span><span>Agadir, Maroc — livraison aéroport Al Massira, hôtels, domicile</span></li>
               <li className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-success-container"><Phone className="h-5 w-5 text-on-success-container" /></span><a href="https://wa.me/212661689659" className="font-bold text-primary hover:underline">{t("contact_phone_full")}</a></li>
               <li className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-surface-container"><Mail className="h-5 w-5 text-primary" /></span>contact@shamydrive.ma</li>
-              <li className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-tertiary-container"><Clock className="h-5 w-5 text-on-tertiary-container" /></span>7j/7 — 08:00 à 22:00 (assistance 24/7 en location)</li>
+              <li className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-tertiary-container"><Clock className="h-5 w-5 text-on-tertiary-container" /></span>7j/7 — 08:00 à 22:00 (assistance pendant la location)</li>
             </ul>
           </div>
           <div className="overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest">

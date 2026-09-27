@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { MField, fieldInput } from "@/components/ui/Field";
+import { Spinner } from "@/components/ui/Motion";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -41,7 +42,8 @@ export default function LoginForm() {
         <MField label="Email"><input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required autoComplete="email" placeholder="toi@email.com" className={fieldInput} /></MField>
         <MField label="Mot de passe"><input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required autoComplete="current-password" placeholder="••••••••" className={fieldInput} /></MField>
         {error && <p role="alert" className="rounded-2xl bg-error-container/60 px-4 py-3 text-[13px] font-semibold text-error">{error}</p>}
-        <button type="submit" disabled={loading} className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-ink text-[15px] font-bold text-white transition hover:bg-primary active:scale-[0.98] disabled:opacity-50">
+        <button type="submit" disabled={loading} className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-ink text-[15px] font-bold text-white transition hover:bg-primary active:scale-[0.98] disabled:opacity-50">
+          {loading ? <Spinner /> : null}
           {loading ? "Connexion..." : "Se connecter"}
         </button>
       </form>
