@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 import Providers from "./providers";
 import Script from "next/script";
 import MobileNav from "@/components/layout/MobileNav";
+import BackToTop from "@/components/layout/BackToTop";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <Providers>{children}</Providers>
         <MobileNav />
+        <BackToTop />
         <Script src="https://studio.pickaxe.co/api/embed/bundle.js" defer />
       </body>
     </html>

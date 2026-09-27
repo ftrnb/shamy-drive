@@ -67,7 +67,7 @@ export default function Hero() {
             <motion.div
               {...anim(0.2)}
               style={reduce ? undefined : { y: cardY }}
-              className="relative overflow-hidden rounded-[28px] bg-gradient-to-b from-surface-container-lowest to-primary-container p-6 sm:p-8"
+              className="relative overflow-hidden rounded-[28px] border border-outline-variant/30 bg-gradient-to-b from-surface-container-lowest to-primary-container p-6 dark:border-white/10 sm:p-8"
             >
               <div className="flex items-center justify-between">
                 <span className="rounded-full bg-ink px-3.5 py-1.5 text-[12px] font-bold text-white">Dacia Duster • SUV</span>

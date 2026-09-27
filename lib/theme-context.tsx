@@ -57,6 +57,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const r = resolve(t);
     setResolved(r);
     apply(r);
+    // Seamless crossfade: animate color-only properties briefly
+    const el = document.documentElement;
+    el.classList.add("theme-anim");
+    window.setTimeout(() => el.classList.remove("theme-anim"), 450);
   }, []);
 
   return <ThemeContext.Provider value={{ theme, resolved, setTheme }}>{children}</ThemeContext.Provider>;

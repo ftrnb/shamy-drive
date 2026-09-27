@@ -3,6 +3,7 @@ import Footer from "@/components/layout/Footer";
 import CarCard from "@/components/cars/CarCard";
 import { prisma } from "@/lib/prisma";
 import VoituresHeader from "@/components/voitures/VoituresHeader";
+import ScrollProgress from "@/components/ui/ScrollProgress";
 import VoituresFilters, { VoituresAvailable, VoituresEmpty, ActiveChips } from "@/components/voitures/VoituresFilters";
 
 interface SearchParams {
@@ -85,6 +86,7 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
   return (
     <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
+      <ScrollProgress />
       <VoituresHeader />
 
       <section className="mx-auto max-w-6xl px-3 py-6 sm:px-5">

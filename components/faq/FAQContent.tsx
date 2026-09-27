@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Info,
@@ -15,12 +15,97 @@ import {
   Shield,
   Search,
   X,
+  Link2,
 } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import Reveal from "@/components/ui/Reveal";
+import { toast } from "@/components/ui/Toaster";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { easeOut } from "@/components/ui/Motion";
 
 type FAQItem = { q: string; a: string };
 type FAQCategory = { id: string; icon: React.ElementType; label: string; labelEn: string; items: FAQItem[]; itemsEn: FAQItem[] };
+
+function FaqItem({
+  id,
+  q,
+  a,
+  open,
+  onToggle,
+  copyLabel,
+  copiedLabel,
+}: {
+  id: string;
+  q: string;
+  a: string;
+  open: boolean;
+  onToggle: () => void;
+  copyLabel: string;
+  copiedLabel: string;
+}) {
+  const reduce = useReducedMotion();
+
+  async function copyLink() {
+    const url = `${window.location.origin}${window.location.pathname}#${id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast(copiedLabel, { desc: url });
+    } catch {
+      toast(copyLabel, { tone: "error" });
+    }
+  }
+
+  return (
+    <div
+      id={id}
+      className={`scroll-mt-32 overflow-hidden rounded-[20px] border bg-surface-container-lowest transition-all duration-200 hover:border-outline hover:shadow-m3-1 ${
+        open ? "border-outline shadow-m3-1" : "border-outline-variant/50"
+      }`}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex min-h-[64px] w-full cursor-pointer items-center justify-between gap-4 p-5 text-left text-[15px] font-bold leading-6"
+      >
+        <span>{q}</span>
+        <motion.span
+          animate={reduce ? undefined : { rotate: open ? 45 : 0, scale: open ? 1.08 : 1 }}
+          transition={{ duration: 0.3, ease: easeOut }}
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[20px] font-light leading-none transition-colors duration-200 ${
+            open ? "bg-ink text-white" : "bg-surface-container text-primary"
+          }`}
+        >
+          +
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            animate={reduce ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.38, ease: easeOut }}
+            className="overflow-hidden"
+          >
+            <p className="px-5 text-sm leading-7 text-on-surface-variant">{a}</p>
+            <div className="px-5 pb-5 pt-3">
+              <button
+                type="button"
+                onClick={copyLink}
+                aria-label={copyLabel}
+                className="group inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-surface-container px-3.5 text-[12px] font-bold text-on-surface-variant transition hover:bg-surface-container-high hover:text-on-surface active:scale-95"
+              >
+                <Link2 className="h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-12" />
+                {copyLabel}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 // Unified categories with both languages - rendered based on lang
 const categories: FAQCategory[] = [
@@ -401,8 +486,10 @@ const categories: FAQCategory[] = [
 export default function FAQContent() {
   const { lang } = useLanguage();
   const isFr = lang === "fr";
+  const reduce = useReducedMotion();
   const [query, setQuery] = useState("");
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const [activeCat, setActiveCat] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return categories;
@@ -418,60 +505,113 @@ export default function FAQContent() {
   }, [query, isFr]);
 
   const totalQuestions = categories.reduce((acc, c) => acc + c.items.length, 0);
+  const resultCount = filtered.reduce(
+    (a, c) => a + ((c as unknown as { _filtered?: FAQItem[] })._filtered?.length ?? (isFr ? c.items : c.itemsEn).length),
+    0
+  );
+
+  // Scroll-spy: highlight the pill of the section currently in view
+  useEffect(() => {
+    if (query.trim()) {
+      setActiveCat(null);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActiveCat(e.target.id);
+        });
+      },
+      { rootMargin: "-25% 0px -65% 0px" }
+    );
+    filtered.forEach((c) => {
+      const el = document.getElementById(c.id);
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, [filtered, query]);
 
   return (
     <>
       {/* Hero */}
       <div className="px-3 pt-24 sm:px-5 sm:pt-28">
-        <div className="mx-auto max-w-6xl rounded-[32px] bg-ink p-7 text-white sm:p-10">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-[#C1272D]">FAQ</p>
-          <h1 className="mt-3 text-4xl font-black uppercase tracking-tight md:text-5xl">
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: easeOut }}
+          className="mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-ink p-7 text-white shadow-m3-3 sm:p-10"
+        >
+          <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-[12px] font-bold tracking-wide text-white/85">
+            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-tertiary-container" />
+            FAQ
+          </p>
+          <h1 className="mt-4 font-display text-[38px] font-bold leading-[1.0] tracking-tight sm:text-[52px]">
             {isFr ? "Questions" : "Frequently"}
             <br />
-            <span className="text-[#C1272D]">{isFr ? "fréquentes." : "asked."}</span>
+            <span className="text-tertiary-container">{isFr ? "fréquentes." : "asked."}</span>
           </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-300">
+          <p className="mt-4 max-w-2xl text-[14px] leading-7 text-white/65">
             {isFr
               ? "Tout ce que nos clients demandent avant de réserver. Recherche instantanée ci-dessous. Si tu ne trouves pas, Shamy ou WhatsApp te répondent en direct."
               : "Everything clients ask before booking. Instant search below. If you don't find an answer, Shamy or WhatsApp will reply live."}
           </p>
           {/* Search */}
           <div className="relative mt-8 max-w-xl">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={isFr ? "Rechercher (ex: caution, aéroport, annulation...)" : "Search (e.g. deposit, airport, cancellation...)"}
-              className="h-[56px] w-full rounded-full border border-white/15 bg-white/10 pl-12 pr-12 text-[15px] text-white placeholder:text-white/40 outline-none focus:border-tertiary-container"
+              aria-label={isFr ? "Rechercher dans la FAQ" : "Search the FAQ"}
+              className="h-[56px] w-full rounded-full border border-white/15 bg-white/10 pl-12 pr-12 text-[15px] text-white placeholder:text-white/40 outline-none transition-all duration-200 focus:border-tertiary-container focus:bg-white/[0.14] focus:ring-4 focus:ring-tertiary-container/20"
             />
             {query && (
               <button
+                type="button"
                 onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
-                aria-label="Clear"
+                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white active:scale-90"
+                aria-label={isFr ? "Effacer" : "Clear"}
               >
                 <X className="h-4 w-4" />
               </button>
             )}
           </div>
-          <p className="mt-3 text-xs text-zinc-500">
-            {isFr ? `${totalQuestions} questions • 10 catégories` : `${totalQuestions} questions • 10 categories`}
-            {query && ` • ${filtered.reduce((a, c) => a + ((c as unknown as { _filtered?: FAQItem[] })._filtered?.length ?? (isFr ? c.items : c.itemsEn).length), 0)} ${isFr ? "résultats" : "results"}`}
-          </p>
-        </div>
+          <div className="mt-3 flex min-h-[28px] items-center">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={query ? `r-${resultCount}` : "t"}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.22 }}
+                className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-[12px] font-semibold text-white/70"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-tertiary-container" />
+                {isFr ? `${totalQuestions} questions • ${categories.length} catégories` : `${totalQuestions} questions • ${categories.length} categories`}
+                {query && ` • ${resultCount} ${isFr ? "résultats" : "results"}`}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </div>
 
       {/* Category pills */}
       <div className="sticky top-[76px] z-30 px-3 sm:px-5">
-        <div className="mx-auto max-w-6xl overflow-x-auto px-6">
-          <div className="flex gap-2 py-3">
+        <div className="mx-auto max-w-6xl">
+          <div className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-6 py-3 sm:mx-0 sm:px-0">
             {categories.map((c) => {
               const label = isFr ? c.label : c.labelEn;
+              const active = activeCat === c.id;
               return (
                 <a
                   key={c.id}
                   href={`#${c.id}`}
-                  className="whitespace-nowrap rounded-full border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-[13px] font-bold text-on-surface transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-m3-1 active:scale-95"
+                  aria-current={active ? "true" : undefined}
+                  className={`whitespace-nowrap rounded-full border px-4 py-2.5 text-[13px] font-bold transition-all duration-200 hover:-translate-y-0.5 active:scale-95 ${
+                    active
+                      ? "border-transparent bg-ink text-white shadow-m3-2"
+                      : "border-outline-variant bg-surface-container-lowest/95 text-on-surface shadow-m3-1 backdrop-blur hover:border-primary hover:shadow-m3-1"
+                  }`}
                 >
                   {label}
                 </a>
@@ -502,30 +642,24 @@ export default function FAQContent() {
                     <span className="ml-auto rounded-full bg-surface-container-lowest px-2.5 py-1 text-xs font-bold text-on-surface-variant">{items.length}</span>
                   </div>
                   <div className="mt-3 space-y-2.5">
-                    {items.map((f) => {
+                    {items.map((f, fi) => {
                       const key = `${cat.id}-${f.q}`;
-                      const isOpen = openKey === key || !!query;
+                      const itemId = `faq-${cat.id}-${fi}`;
+                      const isOpen = query ? true : openKey === key;
                       return (
-                        <details
+                        <FaqItem
                           key={f.q}
+                          id={itemId}
+                          q={f.q}
+                          a={f.a}
                           open={isOpen}
-                          onToggle={(e) => {
-                            // keep controlled if not searching
+                          onToggle={() => {
                             if (query) return;
-                            const target = e.currentTarget as HTMLDetailsElement;
-                            if (target.open) setOpenKey(key);
-                            else if (openKey === key) setOpenKey(null);
+                            setOpenKey(isOpen ? null : key);
                           }}
-                          className="group overflow-hidden rounded-[20px] border border-outline-variant/50 bg-surface-container-lowest transition-all duration-200 hover:border-outline hover:shadow-m3-1 open:shadow-m3-1"
-                        >
-                          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-[15px] font-bold leading-6">
-                            <span>{f.q}</span>
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary transition-all duration-300 group-open:rotate-45 group-open:bg-ink group-open:text-white">
-                              +
-                            </span>
-                          </summary>
-                          <p className="faq-answer px-5 pb-5 text-sm leading-7 text-on-surface-variant">{f.a}</p>
-                        </details>
+                          copyLabel={isFr ? "Copier le lien" : "Copy link"}
+                          copiedLabel={isFr ? "Lien copié" : "Link copied"}
+                        />
                       );
                     })}
                   </div>

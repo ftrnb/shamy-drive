@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Phone, Mail, Clock, ArrowUpRight } from "lucide-react";
+import { MapPin, Phone, Clock, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import Reveal from "@/components/ui/Reveal";
 
@@ -64,9 +64,8 @@ export default function Footer() {
           <div>
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-white/50">{t("footer_contact" as any)}</h4>
             <ul className="mt-4 space-y-3 text-[14px]">
-              <li className="flex items-start gap-2.5 text-white/75"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-tertiary-container" /> Agadir, Maroc — livraison aéroport</li>
-              <li><a href="https://wa.me/212661689659" target="_blank" className="flex items-center gap-2.5 font-semibold text-white hover:underline"><Phone className="h-4 w-4 text-tertiary-container" /> +212 6 61 68 96 59</a></li>
-              <li className="flex items-center gap-2.5 text-white/75"><Mail className="h-4 w-4 text-tertiary-container" /> contact@shamydrive.ma</li>
+              <li className="flex items-start gap-2.5 text-white/75"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-tertiary-container transition-transform duration-300 hover:scale-125" /> Agadir, Maroc — livraison aéroport</li>
+              <li><a href="https://wa.me/212661689659" target="_blank" className="link-underline flex items-center gap-2.5 font-semibold text-white"><Phone className="h-4 w-4 text-tertiary-container" /> +212 6 61 68 96 59</a></li>
             </ul>
           </div>
         </div>
