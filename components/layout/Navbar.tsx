@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -25,10 +25,6 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [navHidden, setNavHidden] = useState(false);
-  const lastY = useRef(0);
-  const openRef = useRef(open);
-  openRef.current = open;
   const pathname = usePathname();
   const router = useRouter();
   const reduceMotion = useReducedMotion();
@@ -39,14 +35,11 @@ export default function Navbar() {
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 24);
-      // App-like auto-hide: slide away on scroll down, return on scroll up
-      setNavHidden(!reduceMotion && y > lastY.current && y > 260 && !openRef.current);
-      lastY.current = y;
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [reduceMotion]);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -114,7 +107,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`fixed inset-x-0 top-0 z-50 px-3 pt-3 transition-transform duration-300 sm:px-5 sm:pt-4 ${navHidden && !open ? "-translate-y-[120%]" : "translate-y-0"}`}>
+      <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
         <nav
           aria-label="Navigation principale"
           className={cn(

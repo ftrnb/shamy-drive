@@ -74,64 +74,73 @@
   --shadow-m3-3: 0 8px 24px rgba(32, 26, 25, 0.12), 0 2px 8px rgba(193, 39, 45, 0.08);
   --shadow-m3-4: 0 16px 40px rgba(32, 26, 25, 0.16);
 
-  --animate-m3-fade-up: m3-fade-up 0.55s var(--ease-emphasized) both;
-  --animate-m3-rise: m3-rise 0.5s var(--ease-emphasized) both;
+  --animate-m3-fade-up: m3-fade-up 0.55s var(--ease-emphasized) backwards;
+  --animate-m3-rise: m3-rise 0.5s var(--ease-emphasized) backwards;
   --animate-float: m3-float 5s ease-in-out infinite;
   --animate-float-late: m3-float 6s ease-in-out 1.2s infinite;
   --animate-shimmer: m3-shimmer 1.6s linear infinite;
   --animate-pulse-dot: m3-pulse-dot 2s ease-in-out infinite;
 }
 
-/* M3 dark scheme — same tokens, tonal inversion */
+/* M3 dark scheme — hand-tuned warm espresso + ember, NOT an inversion.
+   Deep brown-black surfaces, glowing ember primary, candlelight gold. */
 .dark {
   color-scheme: dark;
-  --color-primary: #ffb3ad;
-  --color-on-primary: #680003;
-  --color-primary-container: #930014;
-  --color-on-primary-container: #ffdad6;
+  --color-primary: #ff7a6b;
+  --color-on-primary: #480d07;
+  --color-primary-container: #6e1710;
+  --color-on-primary-container: #ffd9d4;
 
-  --color-secondary: #e7bdb8;
+  --color-secondary: #ecbcb4;
   --color-on-secondary: #442926;
-  --color-secondary-container: #5d3f3c;
+  --color-secondary-container: #5d3a36;
   --color-on-secondary-container: #ffdad6;
 
-  --color-tertiary: #dec656;
-  --color-on-tertiary: #383000;
-  --color-tertiary-container: #4f4700;
+  --color-tertiary: #ffd166;
+  --color-on-tertiary: #3a2c00;
+  --color-tertiary-container: #574300;
   --color-on-tertiary-container: #ffe16e;
 
   --color-error: #ffb4ab;
   --color-on-error: #690005;
   --color-error-container: #93000a;
 
-  --color-success: #6fdd8b;
+  --color-success: #7fe39a;
   --color-on-success: #003919;
-  --color-success-container: #0c4f22;
+  --color-success-container: #0b5227;
   --color-on-success-container: #a9f0bb;
 
-  --color-background: #141210;
-  --color-on-background: #ece0de;
-  --color-surface: #141210;
-  --color-on-surface: #ece0de;
-  --color-surface-variant: #534341;
-  --color-on-surface-variant: #d8c2bd;
+  --color-background: #121010;
+  --color-on-background: #f5ebe6;
+  --color-surface: #121010;
+  --color-on-surface: #f5ebe6;
+  --color-surface-variant: #5c4b48;
+  --color-on-surface-variant: #d9c4bd;
 
-  --color-surface-container-lowest: #0e0d0d;
-  --color-surface-container-low: #1c1a19;
-  --color-surface-container: #221f1e;
-  --color-surface-container-high: #2c2a29;
-  --color-surface-container-highest: #373534;
+  --color-surface-container-lowest: #0c0b0b;
+  --color-surface-container-low: #1a1717;
+  --color-surface-container: #221e1d;
+  --color-surface-container-high: #2d2827;
+  --color-surface-container-highest: #3a3331;
 
-  --color-surface-dim: #141210;
-  --color-outline: #a08c89;
-  --color-outline-variant: #534341;
+  --color-surface-dim: #121010;
+  --color-outline: #a08c88;
+  --color-outline-variant: #4e423f;
 
   --color-scrim: #000000;
 
-  --shadow-m3-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-m3-2: 0 2px 8px rgba(0, 0, 0, 0.45), 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-m3-3: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-m3-4: 0 16px 40px rgba(0, 0, 0, 0.55);
+  --shadow-m3-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-m3-2: 0 2px 10px rgba(0, 0, 0, 0.5), 0 6px 22px rgba(0, 0, 0, 0.4);
+  --shadow-m3-3: 0 10px 30px rgba(0, 0, 0, 0.55);
+  --shadow-m3-4: 0 18px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* Ember glow on primary fills — dark only, subtle */
+.dark .bg-primary {
+  box-shadow: 0 6px 24px rgba(255, 122, 107, 0.28), 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.dark .bg-primary:hover {
+  box-shadow: 0 8px 30px rgba(255, 122, 107, 0.4), 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes m3-fade-up {
@@ -233,9 +242,10 @@ select option { background: var(--color-surface-container-lowest); color: var(--
     box-shadow 0.4s ease, text-decoration-color 0.4s ease !important;
 }
 
-/* Page entry — every navigation fades up once */
+/* Page entry — every navigation fades up once (no fill: a lingering
+   transform would re-anchor fixed descendants to <main> instead of viewport) */
 main#contenu {
-  animation: page-in 0.5s var(--ease-emphasized) both;
+  animation: page-in 0.5s var(--ease-emphasized);
 }
 @keyframes page-in {
   from { opacity: 0; transform: translateY(14px); }
@@ -247,6 +257,35 @@ main#contenu {
   background: linear-gradient(90deg, var(--color-surface-container) 25%, var(--color-surface-container-high) 50%, var(--color-surface-container) 75%);
   background-size: 800px 100%;
   animation: m3-shimmer 1.6s linear infinite;
+}
+
+/* Infinite ticker — real content only, pauses on hover */
+@keyframes ticker-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-mask {
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-x 36s linear infinite;
+}
+.ticker-mask:hover .ticker-track { animation-play-state: paused; }
+
+/* Sheen sweep on hover — subtle light pass */
+.sheen { position: relative; overflow: hidden; }
+.sheen::before {
+  content: ""; position: absolute; inset: -20%; z-index: 1; pointer-events: none;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.16) 50%, transparent 58%);
+  transform: translateX(-130%);
+  transition: transform 0.9s var(--ease-emphasized);
+}
+.sheen:hover::before { transform: translateX(130%); }
+.dark .sheen::before {
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.1) 50%, transparent 58%);
 }
 
 /* Arrow nudge on hover for CTA links */
@@ -277,5 +316,6 @@ details > summary:hover { background-color: color-mix(in srgb, var(--color-surfa
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  .animate-float, .animate-float-late { animation: none !important; }
+  .animate-float, .animate-float-late, .ticker-track { animation: none !important; }
+  .sheen::before { display: none; }
 }

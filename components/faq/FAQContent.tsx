@@ -58,22 +58,22 @@ function FaqItem({
   return (
     <div
       id={id}
-      className={`scroll-mt-32 overflow-hidden rounded-[20px] border bg-surface-container-lowest transition-all duration-200 hover:border-outline hover:shadow-m3-1 ${
-        open ? "border-outline shadow-m3-1" : "border-outline-variant/50"
+      className={`scroll-mt-32 border-b border-outline-variant/40 px-1 transition-colors duration-200 sm:px-3 ${
+        open ? "bg-surface-container/70" : "hover:bg-surface-container/40"
       }`}
     >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex min-h-[64px] w-full cursor-pointer items-center justify-between gap-4 p-5 text-left text-[15px] font-bold leading-6"
+        className="group flex min-h-[68px] w-full cursor-pointer items-center gap-4 py-4 text-left"
       >
-        <span>{q}</span>
+        <span className={`flex-1 text-[15px] font-bold leading-6 transition-colors duration-200 sm:text-[16px] ${open ? "text-primary" : ""}`}>{q}</span>
         <motion.span
           animate={reduce ? undefined : { rotate: open ? 45 : 0, scale: open ? 1.08 : 1 }}
           transition={{ duration: 0.3, ease: easeOut }}
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[20px] font-light leading-none transition-colors duration-200 ${
-            open ? "bg-ink text-white" : "bg-surface-container text-primary"
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[22px] font-light leading-none transition-all duration-200 group-active:scale-90 ${
+            open ? "bg-ink text-white shadow-m3-1" : "border border-outline-variant/60 text-on-surface-variant group-hover:border-primary group-hover:text-primary"
           }`}
         >
           +
@@ -88,8 +88,8 @@ function FaqItem({
             transition={{ duration: 0.38, ease: easeOut }}
             className="overflow-hidden"
           >
-            <p className="px-5 text-sm leading-7 text-on-surface-variant">{a}</p>
-            <div className="px-5 pb-5 pt-3">
+            <p className="px-0 pb-1 text-sm leading-7 text-on-surface-variant sm:pr-14">{a}</p>
+            <div className="pb-5 pt-3 sm:pr-14">
               <button
                 type="button"
                 onClick={copyLink}
@@ -625,7 +625,7 @@ export default function FAQContent() {
       <section className="mx-auto max-w-6xl px-6 py-8 pb-16">
         <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
           <div className="space-y-10">
-            {filtered.map((cat) => {
+            {filtered.map((cat, ci) => {
               const Icon = cat.icon;
               const label = isFr ? cat.label : cat.labelEn;
               const items: FAQItem[] =
@@ -634,14 +634,21 @@ export default function FAQContent() {
               return (
                 <Reveal key={cat.id}>
                 <div id={cat.id} className="scroll-mt-28">
-                  <div className="flex items-center gap-3 rounded-[20px] bg-surface-container px-5 py-4 transition-colors duration-300">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-ink text-white transition-transform duration-300 hover:scale-110 hover:rotate-6">
-                      <Icon className="h-4 w-4" />
+                  <div className="flex items-end gap-4 px-1 sm:px-3">
+                    <span aria-hidden className="font-display text-[52px] font-bold leading-[0.85] text-outline-variant/50 transition-colors duration-300 sm:text-[64px]">
+                      {String(ci + 1).padStart(2, "0")}
                     </span>
-                    <h2 className="text-sm font-black uppercase tracking-widest">{label}</h2>
-                    <span className="ml-auto rounded-full bg-surface-container-lowest px-2.5 py-1 text-xs font-bold text-on-surface-variant">{items.length}</span>
+                    <div className="pb-0.5">
+                      <h2 className="font-display text-[22px] font-bold tracking-tight sm:text-[26px]">{label}</h2>
+                      <p className="mt-1 text-[13px] font-semibold text-on-surface-variant">
+                        {items.length} {isFr ? "questions" : "questions"}
+                      </p>
+                    </div>
+                    <span className="mb-2 ml-auto hidden h-11 w-11 items-center justify-center rounded-2xl bg-surface-container text-primary transition-transform duration-300 hover:scale-110 hover:rotate-6 sm:flex">
+                      <Icon className="h-5 w-5" />
+                    </span>
                   </div>
-                  <div className="mt-3 space-y-2.5">
+                  <div className="mt-4 border-t border-outline-variant/40">
                     {items.map((f, fi) => {
                       const key = `${cat.id}-${f.q}`;
                       const itemId = `faq-${cat.id}-${fi}`;
