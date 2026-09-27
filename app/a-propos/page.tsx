@@ -6,7 +6,7 @@ export const metadata = { title: "À propos — Shamy Drive" };
 
 export default function AProposPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
       <AproposContent />
       <Footer />

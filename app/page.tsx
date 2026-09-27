@@ -9,9 +9,10 @@ export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
+    <main id="contenu" className="min-h-screen bg-background pb-2">
       <Navbar />
       <Hero />
+      <div className="h-5" />
       <SearchBar />
       <FleetPreview />
       <HomeFeatures />

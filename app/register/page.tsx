@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft } from "lucide-react";
+import { MField, fieldInput } from "@/components/ui/Field";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -46,33 +47,24 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-100 px-4 py-12">
-      <div className="w-full max-w-md bg-white border border-zinc-200 p-8 shadow-xl">
-        <Link href="/" className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-black"><ArrowLeft className="h-4 w-4" /> Accueil</Link>
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C1272D]">Shamy Drive</p>
-        <h1 className="mt-2 text-3xl font-black uppercase">Créer un compte</h1>
-        <p className="mt-2 text-sm text-zinc-500">Réservez plus vite, suivez vos locations.</p>
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-md rounded-[32px] border border-outline-variant/40 bg-surface-container-lowest p-7 shadow-m3-2 sm:p-9">
+        <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-surface-container px-4 text-[13px] font-bold text-on-surface-variant"><ArrowLeft className="h-4 w-4" /> Accueil</Link>
+        <p className="mt-5 inline-flex rounded-full bg-primary-container px-3.5 py-1.5 text-[12px] font-bold text-on-primary-container">Shamy Drive</p>
+        <h1 className="mt-3 font-display text-[30px] font-bold">Créer un compte</h1>
+        <p className="mt-1 text-[14px] text-on-surface-variant">Réserve plus vite, suis tes locations.</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500">Nom complet</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} required className="w-full border border-zinc-300 px-4 py-3 text-sm outline-none focus:border-[#C1272D]" placeholder="Ex: Youssef Benali" />
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500">Email</label>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="w-full border border-zinc-300 px-4 py-3 text-sm outline-none focus:border-[#C1272D]" />
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500">Mot de passe</label>
-            <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required minLength={8} className="w-full border border-zinc-300 px-4 py-3 text-sm outline-none focus:border-[#C1272D]" placeholder="8 caractères minimum" />
-          </div>
-          {error && <p className="bg-[#C1272D]/10 border border-[#C1272D]/20 px-4 py-3 text-sm text-[#C1272D]">{typeof error === "string" ? error : JSON.stringify(error)}</p>}
-          <button type="submit" disabled={loading} className="w-full bg-[#C1272D] py-4 text-sm font-black uppercase tracking-widest text-white hover:bg-black transition disabled:opacity-50">
+          <MField label="Nom complet"><input value={name} onChange={(e) => setName(e.target.value)} required className={fieldInput} placeholder="Ex : Youssef Benali" autoComplete="name" /></MField>
+          <MField label="Email"><input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className={fieldInput} placeholder="toi@email.com" autoComplete="email" /></MField>
+          <MField label="Mot de passe"><input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required minLength={8} className={fieldInput} placeholder="8 caractères minimum" autoComplete="new-password" /></MField>
+          {error && <p role="alert" className="rounded-2xl bg-error-container/60 px-4 py-3 text-[13px] font-semibold text-error">{typeof error === "string" ? error : JSON.stringify(error)}</p>}
+          <button type="submit" disabled={loading} className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-primary text-[15px] font-bold text-white shadow-m3-1 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-50">
             {loading ? "Création..." : "Créer mon compte"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-zinc-500">Déjà inscrit ? <Link href="/login" className="font-bold text-[#C1272D] hover:text-black">Se connecter</Link></p>
+        <p className="mt-5 text-center text-[14px] text-on-surface-variant">Déjà inscrit ? <Link href="/login" className="font-bold text-primary hover:underline">Se connecter</Link></p>
       </div>
     </main>
   );

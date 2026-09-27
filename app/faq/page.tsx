@@ -6,7 +6,7 @@ export const metadata = { title: "FAQ — Shamy Drive" };
 
 export default function FAQPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
       <FAQContent />
       <Footer />

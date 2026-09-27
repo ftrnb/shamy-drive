@@ -20,10 +20,10 @@ export default async function ReservationPage({ params, searchParams }: { params
   if (!car) notFound();
 
   return (
-    <main className="min-h-screen bg-zinc-100">
+    <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
       <ReservationHeader car={car} id={id} />
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl px-3 py-6 sm:px-5">
         <ReservationClient car={car as any} initialStartDate={sp.startDate || ""} initialEndDate={sp.endDate || ""} />
       </section>
       <Footer />

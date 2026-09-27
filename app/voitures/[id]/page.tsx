@@ -37,7 +37,7 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
   const waUrl = `https://wa.me/212661689659?text=${encodeURIComponent(whatsappMsg)}`;
 
   return (
-    <main className="min-h-screen bg-zinc-50">
+    <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
       <CarDetailContent car={car} validImages={validImages} avgRating={avgRating} waUrl={waUrl} />
       <Footer />

@@ -421,8 +421,8 @@ export default function FAQContent() {
   return (
     <>
       {/* Hero */}
-      <div className="bg-[#0A0A0A] px-6 pb-10 pt-28 text-white">
-        <div className="mx-auto max-w-6xl">
+      <div className="px-3 pt-24 sm:px-5 sm:pt-28">
+        <div className="mx-auto max-w-6xl rounded-[32px] bg-ink p-7 text-white sm:p-10">
           <p className="text-xs font-black uppercase tracking-[0.25em] text-[#C1272D]">FAQ</p>
           <h1 className="mt-3 text-4xl font-black uppercase tracking-tight md:text-5xl">
             {isFr ? "Questions" : "Frequently"}
@@ -441,7 +441,7 @@ export default function FAQContent() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={isFr ? "Rechercher (ex: caution, aéroport, annulation...)" : "Search (e.g. deposit, airport, cancellation...)"}
-              className="w-full border border-white/15 bg-white/5 py-3 pl-11 pr-11 text-sm text-white placeholder:text-zinc-500 focus:border-[#C1272D] focus:outline-none"
+              className="h-[56px] w-full rounded-full border border-white/15 bg-white/10 pl-12 pr-12 text-[15px] text-white placeholder:text-white/40 outline-none focus:border-tertiary-container"
             />
             {query && (
               <button
@@ -461,7 +461,7 @@ export default function FAQContent() {
       </div>
 
       {/* Category pills */}
-      <div className="sticky top-[72px] z-30 border-b border-zinc-200 bg-white/90 backdrop-blur">
+      <div className="sticky top-[76px] z-30 px-3 sm:px-5">
         <div className="mx-auto max-w-6xl overflow-x-auto px-6">
           <div className="flex gap-2 py-3">
             {categories.map((c) => {
@@ -470,7 +470,7 @@ export default function FAQContent() {
                 <a
                   key={c.id}
                   href={`#${c.id}`}
-                  className="whitespace-nowrap border border-zinc-200 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-zinc-700 hover:border-black hover:bg-black hover:text-white transition"
+                  className="whitespace-nowrap rounded-full border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-[13px] font-bold text-on-surface transition hover:border-ink"
                 >
                   {label}
                 </a>
@@ -492,14 +492,14 @@ export default function FAQContent() {
               if (items.length === 0) return null;
               return (
                 <div key={cat.id} id={cat.id} className="scroll-mt-28">
-                  <div className="flex items-center gap-3 border-l-4 border-[#C1272D] bg-zinc-50 px-4 py-3">
-                    <span className="flex h-8 w-8 items-center justify-center bg-black text-white">
+                  <div className="flex items-center gap-3 rounded-[20px] bg-surface-container px-5 py-4">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-ink text-white">
                       <Icon className="h-4 w-4" />
                     </span>
                     <h2 className="text-sm font-black uppercase tracking-widest">{label}</h2>
                     <span className="ml-auto text-xs font-bold text-zinc-500">{items.length}</span>
                   </div>
-                  <div className="mt-3 divide-y divide-zinc-200 border border-zinc-200">
+                  <div className="mt-3 space-y-2.5">
                     {items.map((f) => {
                       const key = `${cat.id}-${f.q}`;
                       const isOpen = openKey === key || !!query;
@@ -514,11 +514,11 @@ export default function FAQContent() {
                             if (target.open) setOpenKey(key);
                             else if (openKey === key) setOpenKey(null);
                           }}
-                          className="group bg-white open:bg-zinc-50"
+                          className="group overflow-hidden rounded-[20px] border border-outline-variant/50 bg-surface-container-lowest open:shadow-m3-1"
                         >
-                          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-sm font-black uppercase leading-6 hover:bg-zinc-50">
+                          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-[15px] font-bold leading-6">
                             <span>{f.q}</span>
-                            <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-zinc-200 bg-white text-[#C1272D] transition group-open:rotate-45 group-open:bg-black group-open:text-white">
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary transition group-open:rotate-45 group-open:bg-ink group-open:text-white">
                               +
                             </span>
                           </summary>

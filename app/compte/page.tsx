@@ -29,16 +29,16 @@ export default async function ComptePage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50">
+    <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
       <div className="bg-[#0A0A0A] px-6 pb-8 pt-24 text-white">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-6xl">
           <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C1272D]">Mon compte</p>
           <h1 className="mt-2 text-3xl font-black uppercase sm:text-4xl">Bonjour, {user.user_metadata?.full_name || user.email}</h1>
           <p className="mt-2 text-sm text-zinc-400">{user.email} • {bookings.length} réservation(s)</p>
         </div>
       </div>
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl px-3 py-6 sm:px-5">
         <CompteClient bookings={bookings as any} />
       </section>
       <Footer />

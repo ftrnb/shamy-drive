@@ -79,11 +79,11 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50">
+    <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
       <VoituresHeader />
 
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl px-3 py-6 sm:px-5">
         <VoituresFilters q={params.q} category={params.category} transmission={params.transmission} fuel={params.fuel} maxPrice={params.maxPrice} />
 
         <VoituresAvailable startDate={params.startDate} endDate={params.endDate} count={cars.length} />
@@ -96,7 +96,7 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
         ) : cars.length === 0 ? (
           <VoituresEmpty />
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {cars.map((car: any) => {
               const avg = car.reviews.length ? car.reviews.reduce((a: number, r: { rating: number }) => a + r.rating, 0) / car.reviews.length : null;
               return (

@@ -1,25 +1,143 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --red: #c1272d;
+  color-scheme: light;
+  --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --dur-short: 200ms;
+  --dur-medium: 350ms;
+  --dur-long: 550ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-red: var(--red);
-  --font-heading: var(--font-archivo);
-  --font-sans: var(--font-inter);
+@theme {
+  /* M3 Expressive — Shamy Drive (warm paper + brand red) */
+  --color-primary: #c1272d;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ffd9d4;
+  --color-on-primary-container: #410003;
+
+  --color-secondary: #775653;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ffdad6;
+  --color-on-secondary-container: #2d1514;
+
+  --color-tertiary: #6f5d00;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #ffe16e;
+  --color-on-tertiary-container: #221b00;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+
+  --color-success: #146c2e;
+  --color-on-success: #ffffff;
+  --color-success-container: #a9f0bb;
+  --color-on-success-container: #00210d;
+
+  --color-background: #fff8f6;
+  --color-on-background: #201a19;
+  --color-surface: #fff8f6;
+  --color-on-surface: #201a19;
+  --color-surface-variant: #f5ddda;
+  --color-on-surface-variant: #534341;
+
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fff1ee;
+  --color-surface-container: #fceae7;
+  --color-surface-container-high: #f6e0dc;
+  --color-surface-container-highest: #efe0dc;
+
+  --color-surface-dim: #e8d5d1;
+  --color-outline: #857371;
+  --color-outline-variant: #d8c2bd;
+
+  --color-scrim: #0e0b0b;
+  --color-ink: #161112;
+  --color-ink-soft: #2a2324;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-archivo), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 32px;
+
+  --shadow-m3-1: 0 1px 2px rgba(32, 26, 25, 0.08), 0 1px 3px rgba(32, 26, 25, 0.06);
+  --shadow-m3-2: 0 2px 8px rgba(32, 26, 25, 0.08), 0 4px 16px rgba(32, 26, 25, 0.06);
+  --shadow-m3-3: 0 8px 24px rgba(32, 26, 25, 0.12), 0 2px 8px rgba(193, 39, 45, 0.08);
+  --shadow-m3-4: 0 16px 40px rgba(32, 26, 25, 0.16);
+
+  --animate-m3-fade-up: m3-fade-up 0.55s var(--ease-emphasized) both;
+}
+
+@keyframes m3-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
-h1, h2, h3 { font-family: var(--font-archivo), sans-serif; }
+
+h1, h2 { font-family: var(--font-display); letter-spacing: -0.02em; }
+h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
+
+::selection { background: #c1272d; color: #fff; }
+
+/* Focus — M3 ring, always visible for keyboard */
+:focus-visible {
+  outline: 2px solid #c1272d;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* Scrollbar — subtle */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #fceae7; }
+::-webkit-scrollbar-thumb { background: #d8c2bd; border-radius: 999px; border: 2px solid #fceae7; }
+::-webkit-scrollbar-thumb:hover { background: #c1272d; }
+
+/* Inputs — prevent iOS zoom, M3 field base */
+input, select, textarea { font-size: 16px; }
+@media (min-width: 768px) {
+  input, select, textarea { font-size: 15px; }
+}
+input[type="date"] { min-height: 52px; }
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.55; }
+
+/* Utilities */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.snap-row { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+.snap-row > * { scroll-snap-align: start; }
+
+.m3-state-layer { position: relative; overflow: hidden; }
+.m3-state-layer::after {
+  content: ""; position: absolute; inset: 0; opacity: 0; background: currentColor;
+  transition: opacity var(--dur-short) var(--ease-standard); pointer-events: none;
+}
+.m3-state-layer:hover::after { opacity: 0.08; }
+.m3-state-layer:active::after { opacity: 0.12; }
+
+.m3-card-hover { transition: transform var(--dur-medium) var(--ease-emphasized), box-shadow var(--dur-medium) var(--ease-standard), border-color var(--dur-short); }
+.m3-card-hover:hover { transform: translateY(-4px); }
+
+.img-fade { background: linear-gradient(180deg, #fceae7, #fff1ee); }
+
+/* Reduced motion — kill expressive springs */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

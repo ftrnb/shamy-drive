@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Users, Gauge, Fuel, Settings2, ArrowRight, Star } from "lucide-react";
+import { Users, Fuel, Settings2, ArrowRight, Star } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
+import { cn } from "@/lib/utils";
 
 interface CarCardProps {
   id: string;
@@ -22,72 +23,61 @@ interface CarCardProps {
 export default function CarCard({ id, brand, model, category, pricePerDay, image, transmission, fuel, seats, avgRating, available = true }: CarCardProps) {
   const { t } = useLanguage();
   const [imgError, setImgError] = React.useState(false);
-  const imgSrc = imgError || !image ? "/shamydrive.png" : image;
+  const imgSrc = imgError || !image ? "/cars/Loganblanche.png" : image;
+
   return (
-    <article className="group overflow-hidden border border-zinc-200 bg-white transition-all duration-500 hover:-translate-y-1 hover:border-[#C1272D]/30 hover:shadow-xl">
-      <Link href={`/voitures/${id}`} className="block">
-        <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100 p-6 flex items-center justify-center">
+    <article className="m3-card-hover group flex flex-col overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1 hover:shadow-m3-3">
+      <Link href={`/voitures/${id}`} className="block focus:outline-none" aria-label={`${brand} ${model} — ${pricePerDay} DH par jour`}>
+        <div className="img-fade relative aspect-[16/10] overflow-hidden p-5">
           <img
             src={imgSrc}
             alt={`${brand} ${model}`}
-            className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
+            className="h-full w-full object-contain drop-shadow-xl transition-transform duration-500 group-hover:scale-[1.04]"
             loading="lazy"
             onError={() => setImgError(true)}
           />
-          <div className="absolute left-3 top-3 flex gap-2">
-            <span className="bg-[#C1272D] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-white">{category}</span>
-            {!available && <span className="bg-[#0A0A0A] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-white">Indisponible</span>}
+          <div className="absolute left-4 top-4 flex gap-1.5">
+            <span className="rounded-full bg-ink px-3 py-1.5 text-[11px] font-bold text-white">{category}</span>
+            {!available && <span className="rounded-full bg-error px-3 py-1.5 text-[11px] font-bold text-white">Indisponible</span>}
           </div>
-          <div className="absolute bottom-3 right-3 bg-[#0A0A0A] px-4 py-2 text-white">
-            <span className="text-base font-black">{pricePerDay}</span>
-            <span className="ml-1 text-xs text-zinc-300">DH/j</span>
-          </div>
-          {avgRating !== null && avgRating !== undefined && (
-            <div className="absolute right-3 top-3 flex items-center gap-1 bg-white px-2 py-1 text-[11px] font-bold shadow">
-              <Star className="h-3 w-3 fill-[#C1272D] text-[#C1272D]" /> {avgRating.toFixed(1)}
+          {avgRating != null && (
+            <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-surface-container-lowest/95 px-2.5 py-1.5 text-[12px] font-bold shadow-m3-1">
+              <Star className="h-3.5 w-3.5 fill-primary text-primary" /> {avgRating.toFixed(1)}
             </div>
           )}
+          <div className="absolute bottom-4 right-4 rounded-full bg-primary px-4 py-2 text-white shadow-m3-1">
+            <span className="text-[15px] font-bold">{pricePerDay} DH</span>
+            <span className="ml-1 text-[12px] text-white/75">/j</span>
+          </div>
         </div>
       </Link>
 
-      <div className="p-5">
-        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#C1272D]">{brand}</p>
-        <h3 className="mt-1 text-xl font-black uppercase tracking-tight text-[#0A0A0A]">{model}</h3>
+      <div className="flex flex-1 flex-col p-5">
+        <p className="text-[12px] font-bold uppercase tracking-widest text-primary">{brand}</p>
+        <h3 className="mt-0.5 font-display text-[20px] font-bold leading-tight">{model}</h3>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 border-y border-zinc-100 py-4">
-          <div className="flex items-center gap-2">
-            <Settings2 className="h-4 w-4 text-[#C1272D]" />
-            <div>
-              <p className="text-[9px] uppercase tracking-wider text-zinc-400">{t("common_transmission")}</p>
-              <p className="text-xs font-bold text-zinc-800">{transmission === "AUTOMATIC" ? t("vehicles_automatic") : transmission === "MANUAL" ? t("vehicles_manual") : transmission}</p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {[
+            { icon: Settings2, label: t("common_transmission"), value: transmission === "AUTOMATIC" ? t("vehicles_automatic") : transmission === "MANUAL" ? t("vehicles_manual") : transmission },
+            { icon: Fuel, label: t("common_fuel"), value: fuel },
+            { icon: Users, label: t("common_seats"), value: `${seats} pl` },
+          ].map((s) => (
+            <div key={s.label} className="rounded-2xl bg-surface-container px-3 py-2.5 text-center">
+              <s.icon className="mx-auto h-4 w-4 text-primary" />
+              <p className="mt-1 truncate text-[12px] font-bold">{s.value}</p>
+              <p className="text-[11px] text-on-surface-variant">{s.label}</p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Fuel className="h-4 w-4 text-[#C1272D]" />
-            <div>
-              <p className="text-[9px] uppercase tracking-wider text-zinc-400">{t("common_fuel")}</p>
-              <p className="text-xs font-bold text-zinc-800">{fuel}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-[#C1272D]" />
-            <div>
-              <p className="text-[9px] uppercase tracking-wider text-zinc-400">{t("common_seats")}</p>
-              <p className="text-xs font-bold text-zinc-800">{seats}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Gauge className="h-4 w-4 text-[#C1272D]" />
-            <div>
-              <p className="text-[9px] uppercase tracking-wider text-zinc-400">{t("common_available")}</p>
-              <p className={`text-xs font-bold ${available ? "text-green-600" : "text-zinc-400"}`}>{available ? t("common_now") : t("common_on_request")}</p>
-            </div>
-          </div>
+          ))}
         </div>
 
-        <Link href={`/voitures/${id}`} className="mt-4 flex w-full items-center justify-between bg-[#0A0A0A] px-5 py-3.5 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-[#C1272D]">
+        <div className="mt-3 flex items-center gap-2 text-[12px] font-semibold">
+          <span className={cn("h-2 w-2 rounded-full", available ? "bg-success" : "bg-outline")} />
+          <span className={available ? "text-success" : "text-outline"}>{available ? t("common_now") : t("common_on_request")}</span>
+        </div>
+
+        <Link href={`/voitures/${id}`} className="m3-state-layer mt-4 flex min-h-[52px] w-full items-center justify-between rounded-full bg-secondary-container px-5 text-[14px] font-bold text-on-secondary-container transition active:scale-[0.98]">
           <span>{t("common_view_vehicle")}</span>
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-5 w-5" />
         </Link>
       </div>
     </article>

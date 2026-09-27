@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { MField, fieldInput } from "@/components/ui/Field";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -20,52 +21,33 @@ export default function LoginForm() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-
     if (signInError) {
       setError(signInError.message || "Email ou mot de passe incorrect");
       return;
     }
-
     router.push(callbackUrl);
     router.refresh();
   }
 
   return (
-    <div className="w-full max-w-md bg-white border border-zinc-200 p-8 shadow-xl">
-      <Link href="/" className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-black"><ArrowLeft className="h-4 w-4" /> Accueil</Link>
-      <p className="text-xs font-black uppercase tracking-[0.2em] text-[#C1272D]">Shamy Drive</p>
-      <h1 className="mt-2 text-3xl font-black uppercase">Connexion</h1>
-      <p className="mt-2 text-sm text-zinc-500">Connectez-vous pour réserver en temps réel.</p>
-
+    <div className="w-full max-w-md rounded-[32px] border border-outline-variant/40 bg-surface-container-lowest p-7 shadow-m3-2 sm:p-9">
+      <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-surface-container px-4 text-[13px] font-bold text-on-surface-variant hover:text-on-surface"><ArrowLeft className="h-4 w-4" /> Accueil</Link>
+      <p className="mt-5 inline-flex rounded-full bg-primary-container px-3.5 py-1.5 text-[12px] font-bold text-on-primary-container">Shamy Drive</p>
+      <h1 className="mt-3 font-display text-[30px] font-bold">Bon retour</h1>
+      <p className="mt-1 text-[14px] text-on-surface-variant">Connecte-toi pour réserver en temps réel.</p>
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <div>
-          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500">Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="w-full border border-zinc-300 px-4 py-3 text-sm outline-none focus:border-[#C1272D] focus:ring-1 focus:ring-[#C1272D]" />
-        </div>
-        <div>
-          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500">Mot de passe</label>
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required className="w-full border border-zinc-300 px-4 py-3 text-sm outline-none focus:border-[#C1272D]" />
-        </div>
-        {error && <p className="bg-[#C1272D]/10 border border-[#C1272D]/20 px-4 py-3 text-sm text-[#C1272D]">{error}</p>}
-        <button type="submit" disabled={loading} className="w-full bg-[#0A0A0A] py-4 text-sm font-black uppercase tracking-widest text-white hover:bg-[#C1272D] transition disabled:opacity-50">
+        <MField label="Email"><input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required autoComplete="email" placeholder="toi@email.com" className={fieldInput} /></MField>
+        <MField label="Mot de passe"><input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required autoComplete="current-password" placeholder="••••••••" className={fieldInput} /></MField>
+        {error && <p role="alert" className="rounded-2xl bg-error-container/60 px-4 py-3 text-[13px] font-semibold text-error">{error}</p>}
+        <button type="submit" disabled={loading} className="flex min-h-[56px] w-full items-center justify-center rounded-full bg-ink text-[15px] font-bold text-white transition hover:bg-primary active:scale-[0.98] disabled:opacity-50">
           {loading ? "Connexion..." : "Se connecter"}
         </button>
       </form>
-
-      <p className="mt-6 text-center text-sm text-zinc-500">
-        Pas de compte ? <Link href="/register" className="font-bold text-[#C1272D] hover:text-black">Créer un compte</Link>
+      <p className="mt-5 text-center text-[14px] text-on-surface-variant">
+        Pas de compte ? <Link href="/register" className="font-bold text-primary hover:underline">Créer un compte</Link>
       </p>
-
-      <div className="mt-6 border-t border-zinc-200 pt-4 text-xs text-zinc-400">
-        <p>Test : client@test.ma / User123! — Admin : admin@shamydrive.ma / Admin123!</p>
-      </div>
     </div>
   );
 }
