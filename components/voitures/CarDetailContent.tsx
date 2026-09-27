@@ -4,12 +4,12 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, CheckCircle2, Fuel, Settings2, Users, Star, MapPin, MessageCircle, CalendarCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Fuel, Settings2, Users, Star, MapPin, MessageCircle, CalendarCheck, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import Reveal from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
 
-export default function CarDetailContent({ car, validImages, avgRating, waUrl }: { car: any; validImages: any[]; avgRating: number | null; waUrl: string }) {
+export default function CarDetailContent({ car, validImages, avgRating, waUrl, dateQuery = "" }: { car: any; validImages: any[]; avgRating: number | null; waUrl: string; dateQuery?: string }) {
   const { t } = useLanguage();
   const [active, setActive] = useState(0);
   const main = validImages[active]?.url || validImages[0]?.url || "/cars/Loganblanche.png";
@@ -27,7 +27,7 @@ export default function CarDetailContent({ car, validImages, avgRating, waUrl }:
       <section className="mx-auto max-w-6xl px-3 py-5 sm:px-5">
         <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="overflow-hidden rounded-[32px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1">
-            <div className="img-fade relative flex min-h-[320px] items-center justify-center p-6 sm:min-h-[440px] sm:p-10">
+            <div className="img-fade group relative flex min-h-[320px] items-center justify-center p-6 sm:min-h-[440px] sm:p-10">
               <AnimatePresence mode="wait">
                 <motion.div key={main} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="relative h-[280px] w-full sm:h-[380px]">
                   <Image src={main} alt={`${car.brand} ${car.model}`} fill sizes="(max-width: 1024px) 90vw, 640px" className="object-contain drop-shadow-2xl" priority />
@@ -40,6 +40,31 @@ export default function CarDetailContent({ car, validImages, avgRating, waUrl }:
                 <div className="absolute right-5 top-5 flex items-center gap-1.5 rounded-full bg-surface-container-lowest/95 px-3 py-1.5 text-[13px] font-bold shadow-m3-1">
                   <Star className="h-4 w-4 fill-primary text-primary" /> {avgRating.toFixed(1)} <span className="font-medium text-on-surface-variant">({car.reviews.length})</span>
                 </div>
+              )}
+              {validImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setActive((active - 1 + validImages.length) % validImages.length)}
+                    aria-label="Photo précédente"
+                    className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ink/70 text-white opacity-0 backdrop-blur transition-all duration-200 hover:bg-ink focus:opacity-100 active:scale-90 group-hover:opacity-100 max-lg:opacity-100"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActive((active + 1) % validImages.length)}
+                    aria-label="Photo suivante"
+                    className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ink/70 text-white opacity-0 backdrop-blur transition-all duration-200 hover:bg-ink focus:opacity-100 active:scale-90 group-hover:opacity-100 max-lg:opacity-100"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5" aria-hidden>
+                    {validImages.map((_: any, i: number) => (
+                      <span key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === active ? "w-5 bg-primary" : "w-1.5 bg-ink/20"}`} />
+                    ))}
+                  </div>
+                </>
               )}
             </div>
             {validImages.length > 1 && (
@@ -103,8 +128,8 @@ export default function CarDetailContent({ car, validImages, avgRating, waUrl }:
               ))}
             </div>
             <div className="mt-6 space-y-2 pb-16 lg:pb-0">
-              <Link href={`/reservation/${car.id}`} className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-bold text-white shadow-m3-2 transition hover:brightness-110 active:scale-[0.98]">
-                <CalendarCheck className="h-5 w-5" /> {t("detail_book")}
+              <Link href={`/reservation/${car.id}${dateQuery}`} className="group flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-bold text-white shadow-m3-2 transition hover:brightness-110 active:scale-[0.98]">
+                <CalendarCheck className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" /> {t("detail_book")}
               </Link>
               <a href={waUrl} target="_blank" rel="noopener noreferrer" className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-success px-6 text-[15px] font-bold text-white transition hover:brightness-110 active:scale-[0.98]">
                 <MessageCircle className="h-5 w-5" /> WhatsApp
@@ -153,7 +178,7 @@ export default function CarDetailContent({ car, validImages, avgRating, waUrl }:
       <div className="fixed inset-x-3 bottom-[84px] z-40 md:hidden">
         <div className="mx-auto flex max-w-md items-center justify-between gap-3 rounded-full border border-white/10 bg-ink/95 p-2 pl-5 text-white shadow-m3-3 backdrop-blur-xl">
           <div><p className="text-[16px] font-bold leading-none">{car.pricePerDay} DH<span className="text-[12px] font-medium text-white/55">/j</span></p><p className="mt-1 text-[11px] text-white/55">Km illimité inclus</p></div>
-          <Link href={`/reservation/${car.id}`} className="flex min-h-[52px] items-center rounded-full bg-primary px-6 text-[14px] font-bold">Réserver</Link>
+          <Link href={`/reservation/${car.id}${dateQuery}`} className="flex min-h-[52px] items-center rounded-full bg-primary px-6 text-[14px] font-bold transition active:scale-95">Réserver</Link>
         </div>
       </div>
       <div className="h-28 md:hidden" />

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { CalendarDays, CheckCircle2, MapPin, User, Phone, Mail, Clock, Upload, FileText, Shield, ArrowLeft, ArrowRight, MessageCircle } from "lucide-react";
 import { calculateDays } from "@/lib/utils";
+import { readSearch } from "@/lib/search-memory";
 import { useLanguage } from "@/lib/language-context";
 import { MField, fieldInput } from "@/components/ui/Field";
 import { Spinner } from "@/components/ui/Motion";
@@ -21,19 +22,36 @@ const TIMES = ["08:00", "09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "1
 
 export default function ReservationClient({ car, initialStartDate, initialEndDate }: { car: any; initialStartDate: string; initialEndDate: string }) {
   const [user, setUser] = useState<any>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
   const { lang, t } = useLanguage();
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }: any) => setUser(user));
+    let alive = true;
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }: any) => {
+        if (alive) setUser(user);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
   }, [supabase]);
 
   const [step, setStep] = useState(0);
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
-  const [pickupLocation, setPickupLocation] = useState(LOCATIONS[0]);
-  const [dropoffLocation, setDropoffLocation] = useState(LOCATIONS[0]);
+  // Prefill from the last home search when the URL carries no dates
+  const [startDate, setStartDate] = useState(() => initialStartDate || readSearch().pickupDate || "");
+  const [endDate, setEndDate] = useState(() => initialEndDate || readSearch().returnDate || "");
+  const [pickupLocation, setPickupLocation] = useState(() => {
+    const loc = readSearch().location;
+    return loc && LOCATIONS.includes(loc) ? loc : LOCATIONS[0];
+  });
+  const [dropoffLocation, setDropoffLocation] = useState(() => {
+    const loc = readSearch().location;
+    return loc && LOCATIONS.includes(loc) ? loc : LOCATIONS[0];
+  });
   const [pickupTime, setPickupTime] = useState("10:00");
   const [dropoffTime, setDropoffTime] = useState("10:00");
   const [customerName, setCustomerName] = useState("");
@@ -47,6 +65,17 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Keep the current step in view on mobile when advancing
+  const topRef = useRef<HTMLFormElement>(null);
+  const firstStep = useRef(true);
+  useEffect(() => {
+    if (firstStep.current) {
+      firstStep.current = false;
+      return;
+    }
+    topRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  }, [step, reduceMotion]);
 
   const booking = useMemo(() => {
     if (!startDate || !endDate) return { days: 0, total: 0, valid: false };
@@ -136,7 +165,7 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
             <div className="mt-4 rounded-2xl bg-surface-container p-4 text-[14px]">
               <div className="flex justify-between"><span className="text-on-surface-variant">{t("reservation_duration")}</span><span className="font-bold">{booking.days ? `${booking.days} j` : "—"}</span></div>
               <div className="mt-1.5 flex justify-between gap-3"><span className="shrink-0 text-on-surface-variant">Trajet</span><span className="truncate text-right text-[13px] font-semibold">{pickupLocation} → {dropoffLocation}</span></div>
-              <div className="mt-3 flex items-center justify-between border-t border-outline-variant/50 pt-3"><span className="font-bold">{t("reservation_total")}</span><span className="font-display text-[24px] font-bold">{booking.total ? `${booking.total} DH` : "—"}</span></div>
+              <div className="mt-3 flex items-center justify-between border-t border-outline-variant/50 pt-3"><span className="font-bold">{t("reservation_total")}</span><motion.span key={booking.total} initial={reduceMotion ? false : { scale: 0.85, opacity: 0.4 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", damping: 18, stiffness: 400 }} className="font-display text-[24px] font-bold">{booking.total ? `${booking.total} DH` : "—"}</motion.span></div>
               <p className="mt-1 text-[12px] text-on-surface-variant">Km illimité • Assurance incluse</p>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-2 text-center">
@@ -156,7 +185,7 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
       </div>
 
       {/* Steps */}
-      <form onSubmit={handleSubmit} className="overflow-hidden rounded-[32px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1">
+      <form ref={topRef} onSubmit={handleSubmit} className="scroll-mt-24 overflow-hidden rounded-[32px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1">
         <div className="bg-ink px-6 py-5 text-white">
           <div className="flex items-center gap-2">
             {steps.map((s, i) => (
@@ -238,7 +267,7 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
                   <div className="mt-2 flex justify-between"><span className="text-on-surface-variant">{t("reservation_duration")}</span><span className="font-bold">{booking.days} j</span></div>
                   <div className="mt-2 flex justify-between gap-3"><span className="text-on-surface-variant">Dates</span><span className="text-right font-semibold">{startDate} → {endDate}</span></div>
                   <div className="mt-2 flex justify-between gap-3"><span className="text-on-surface-variant">Contact</span><span className="text-right font-semibold">{customerName || "—"} • {customerPhone || "—"}</span></div>
-                  <div className="mt-3 flex items-center justify-between border-t border-outline-variant/50 pt-3"><span className="font-bold">Total</span><span className="font-display text-[26px] font-bold">{booking.total} DH</span></div>
+                  <div className="mt-3 flex items-center justify-between border-t border-outline-variant/50 pt-3"><span className="font-bold">Total</span><motion.span key={booking.total} initial={reduceMotion ? false : { scale: 0.85, opacity: 0.4 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", damping: 18, stiffness: 400 }} className="font-display text-[26px] font-bold">{booking.total} DH</motion.span></div>
                 </div>
                 <label className="flex cursor-pointer gap-3 rounded-2xl border border-outline-variant/50 p-4 text-[13px] leading-6">
                   <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#c1272d]" />
@@ -249,7 +278,7 @@ export default function ReservationClient({ car, initialStartDate, initialEndDat
           </AnimatePresence>
 
           {error && <p role="alert" className="mt-4 rounded-2xl bg-error-container/60 px-4 py-3 text-[13px] font-semibold text-error">{error}</p>}
-          {success && <p role="status" className="mt-4 rounded-2xl bg-success-container/70 px-4 py-3 text-[13px] font-semibold text-on-success-container">{success}</p>}
+          {success && <motion.p role="status" initial={reduceMotion ? false : { scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", damping: 16, stiffness: 350 }} className="mt-4 rounded-2xl bg-success-container/70 px-4 py-3 text-[13px] font-semibold text-on-success-container">{success}</motion.p>}
 
           <div className="mt-6 flex gap-2">
             {step > 0 && (

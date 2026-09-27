@@ -70,6 +70,9 @@ export default function ContactForm() {
                 <MessageCircle className="h-5 w-5" /> WhatsApp direct
               </a>
             )}
+            <button type="button" onClick={() => setSent(null)} className="link-underline mx-auto block min-h-[44px] px-4 text-[13px] font-bold text-on-surface-variant transition hover:text-on-surface">
+              {lang === "fr" ? "Envoyer un autre message" : "Send another message"}
+            </button>
           </div>
         ) : (
           <button type="submit" disabled={loading} className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-full bg-primary text-[15px] font-bold text-white shadow-m3-1 transition hover:brightness-110 active:scale-[0.98] disabled:opacity-60">

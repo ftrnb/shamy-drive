@@ -19,12 +19,15 @@ interface CarCardProps {
   seats: number;
   avgRating?: number | null;
   available?: boolean;
+  /** Extra query string (e.g. chosen dates) preserved through detail → booking. */
+  query?: string;
 }
 
-export default function CarCard({ id, brand, model, category, pricePerDay, image, transmission, fuel, seats, avgRating, available = true }: CarCardProps) {
+export default function CarCard({ id, brand, model, category, pricePerDay, image, transmission, fuel, seats, avgRating, available = true, query = "" }: CarCardProps) {
   const { t } = useLanguage();
   const reduce = useReducedMotion();
   const imgSrc = !image ? "/cars/Loganblanche.png" : image;
+  const href = `/voitures/${id}${query}`;
 
   return (
     <motion.article
@@ -34,7 +37,7 @@ export default function CarCard({ id, brand, model, category, pricePerDay, image
       transition={{ duration: 0.55, ease: easeOut }}
       className="m3-card-hover group flex flex-col overflow-hidden rounded-[28px] border border-outline-variant/40 bg-surface-container-lowest shadow-m3-1 transition-colors duration-300 hover:shadow-m3-3"
     >
-      <Link href={`/voitures/${id}`} className="block focus:outline-none" aria-label={`${brand} ${model} — ${pricePerDay} DH par jour`}>
+      <Link href={href} className="block focus:outline-none" aria-label={`${brand} ${model} — ${pricePerDay} DH par jour`}>
         <div className="img-fade relative aspect-[16/10] overflow-hidden p-5">
           <div className="h-full w-full transition-transform duration-500 group-hover:scale-[1.04]">
             <FadeImage src={imgSrc} alt={`${brand} ${model}`} className="object-contain drop-shadow-xl" />
@@ -78,7 +81,7 @@ export default function CarCard({ id, brand, model, category, pricePerDay, image
           <span className={available ? "text-success" : "text-outline"}>{available ? t("common_now") : t("common_on_request")}</span>
         </div>
 
-        <Link href={`/voitures/${id}`} className="m3-state-layer mt-4 flex min-h-[52px] w-full items-center justify-between rounded-full bg-secondary-container px-5 text-[14px] font-bold text-on-secondary-container transition active:scale-[0.98]">
+        <Link href={href} className="m3-state-layer mt-4 flex min-h-[52px] w-full items-center justify-between rounded-full bg-secondary-container px-5 text-[14px] font-bold text-on-secondary-container transition active:scale-[0.98]">
           <span>{t("common_view_vehicle")}</span>
           <ArrowRight className="arrow-nudge h-5 w-5" />
         </Link>

@@ -3,7 +3,7 @@ import Footer from "@/components/layout/Footer";
 import CarCard from "@/components/cars/CarCard";
 import { prisma } from "@/lib/prisma";
 import VoituresHeader from "@/components/voitures/VoituresHeader";
-import VoituresFilters, { VoituresAvailable, VoituresEmpty } from "@/components/voitures/VoituresFilters";
+import VoituresFilters, { VoituresAvailable, VoituresEmpty, ActiveChips } from "@/components/voitures/VoituresFilters";
 
 interface SearchParams {
   brand?: string;
@@ -78,20 +78,44 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
     cars = [];
   }
 
+  // Preserve chosen dates through detail → booking
+  const dateQuery =
+    params.startDate && params.endDate ? `?startDate=${params.startDate}&endDate=${params.endDate}` : "";
+
   return (
     <main id="contenu" className="min-h-screen bg-background pb-28 md:pb-10">
       <Navbar />
       <VoituresHeader />
 
       <section className="mx-auto max-w-6xl px-3 py-6 sm:px-5">
-        <VoituresFilters q={params.q} category={params.category} transmission={params.transmission} fuel={params.fuel} maxPrice={params.maxPrice} />
+        <VoituresFilters
+          q={params.q}
+          category={params.category}
+          transmission={params.transmission}
+          fuel={params.fuel}
+          maxPrice={params.maxPrice}
+          nl={params.nl}
+          startDate={params.startDate}
+          endDate={params.endDate}
+        />
 
         <VoituresAvailable startDate={params.startDate} endDate={params.endDate} count={cars.length} />
 
+        <ActiveChips
+          q={params.q}
+          category={params.category}
+          transmission={params.transmission}
+          fuel={params.fuel}
+          maxPrice={params.maxPrice}
+          nl={params.nl}
+          startDate={params.startDate}
+          endDate={params.endDate}
+        />
+
         {dbError ? (
-          <div className="border border-red-200 bg-red-50 p-10 text-center text-red-800">
-            <p className="font-black uppercase">Erreur de connexion à la base de données</p>
-            <p className="mt-2 text-sm opacity-80">Vérifie ta configuration DATABASE_URL et assure-toi que ta base est en ligne.</p>
+          <div className="rounded-[28px] border border-error/30 bg-error-container/40 p-10 text-center">
+            <p className="font-display text-[18px] font-bold text-error">Erreur de connexion à la base de données</p>
+            <p className="mx-auto mt-2 max-w-md text-[13px] text-on-surface-variant">Vérifie ta configuration DATABASE_URL et assure-toi que ta base est en ligne.</p>
           </div>
         ) : cars.length === 0 ? (
           <VoituresEmpty />
@@ -113,6 +137,7 @@ export default async function VoituresPage({ searchParams }: { searchParams: Pro
                   seats={car.seats}
                   avgRating={avg}
                   available={car.available}
+                  query={dateQuery}
                 />
               );
             })}

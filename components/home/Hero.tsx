@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, MapPin, Users, Infinity as InfinityIcon, Car } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
@@ -9,6 +9,9 @@ import { FadeImage, easeOut } from "@/components/ui/Motion";
 export default function Hero() {
   const { t, lang } = useLanguage();
   const reduce = useReducedMotion();
+  const { scrollY } = useScroll();
+  const cardY = useTransform(scrollY, [0, 700], [0, 70]);
+  const textY = useTransform(scrollY, [0, 700], [0, -36]);
 
   const anim = (delay: number) =>
     reduce
@@ -24,7 +27,7 @@ export default function Hero() {
       <div className="mx-auto max-w-6xl">
         <div className="overflow-hidden rounded-[32px] bg-ink text-white shadow-m3-3">
           <div className="grid items-center gap-8 p-7 sm:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:p-12">
-            <div>
+            <motion.div style={reduce ? undefined : { y: textY }}>
               <motion.div {...anim(0)}>
                 <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[12px] font-bold tracking-wide text-white/85">
                   <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-tertiary-container" />
@@ -59,10 +62,11 @@ export default function Hero() {
                   <MapPin className="h-4 w-4 text-tertiary-container" /> {t("hero_location")}
                 </span>
               </motion.div>
-            </div>
+            </motion.div>
 
             <motion.div
               {...anim(0.2)}
+              style={reduce ? undefined : { y: cardY }}
               className="relative overflow-hidden rounded-[28px] bg-gradient-to-b from-surface-container-lowest to-primary-container p-6 sm:p-8"
             >
               <div className="flex items-center justify-between">

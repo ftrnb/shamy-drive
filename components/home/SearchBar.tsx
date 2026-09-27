@@ -7,6 +7,7 @@ import { useLanguage } from "@/lib/language-context";
 import { MField, fieldInput, fieldSelect } from "@/components/ui/Field";
 import Reveal from "@/components/ui/Reveal";
 import { calculateDays } from "@/lib/utils";
+import { saveSearch } from "@/lib/search-memory";
 
 const LOCATIONS = ["Agadir Aéroport Al Massira", "Agadir Centre Ville", "Taghazout", "Tamraght", "Essaouira", "Marrakech"];
 
@@ -39,6 +40,7 @@ export default function SearchBar() {
     setErrors(errs);
     if (Object.keys(errs).length) return;
     setNotice(null);
+    saveSearch({ pickupDate, returnDate, location });
     const params = new URLSearchParams({ startDate: pickupDate, endDate: returnDate });
     if (nlQuery.trim()) params.set("nl", nlQuery.trim());
     router.push(`/voitures?${params.toString()}`);
